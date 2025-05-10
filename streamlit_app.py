@@ -34,7 +34,7 @@ def get_label(index):
         return "neither a dog nor a cat"
 
 # Streamlit UI
-st.title("🐶🐱 Dog or Cat Identifier + Llama Description")
+st.title("🐶🐱 Dog or Cat Identifier + AI Description")
 
 uploaded_file = st.file_uploader("Upload an image of a dog or cat", type=["jpg", "jpeg", "png"])
 
@@ -54,8 +54,8 @@ if uploaded_file:
 
     if label in ["dog", "cat"]:
         llm = load_llm()
-        prompt = f"Describe a {label}. Include care tips and personality traits."
-        result = llm(prompt, max_new_tokens=100)[0]["generated_text"]
+        prompt = f"Please describe a {label}. Provide detailed information about their appearance, behavior, care tips, and any personality traits that make them unique. Be sure to focus only on a {label} and not confuse them with other animals."
+        result = llm(prompt, max_new_tokens=150)[0]["generated_text"]
 
         st.subheader("🧠 AI-Generated Description:")
         st.write(result.strip())
