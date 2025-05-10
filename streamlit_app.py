@@ -11,10 +11,15 @@ def load_model():
     model.eval()
     return model
 
-# Falcon text generation
+# Falcon text generation with error handling
 @st.cache_resource
 def load_falcon():
-    return pipeline("text-generation", model="tiiuae/falcon-7b-instruct")
+    try:
+        falcon_model = pipeline("text-generation", model="tiiuae/falcon-7b-instruct")
+        return falcon_model
+    except Exception as e:
+        st.error(f"Error loading Falcon model: {e}")
+        return None
 
 # Image transform
 def preprocess(image):
@@ -42,7 +47,6 @@ if uploaded_file:
     image = Image.open(uploaded_file).convert("RGB")
     st.image(image, caption="Uploaded Image", use_column_width=True)
 
-    # Load the model and make predictions
     model = load_model()
     input_tensor = preprocess(image)
 
@@ -53,16 +57,17 @@ if uploaded_file:
     label = get_label(pred_idx)
     st.subheader(f"Prediction: **{label.upper()}**")
 
-    # Generate description using Falcon model
     if label in ["dog", "cat"]:
         try:
             gen = load_falcon()  # Load Falcon model
-            prompt = f"Describe a {label}. Include care tips and personality traits."
-            result = gen(prompt, max_new_tokens=100)[0]["generated_text"]
-            
-            # Display the result
-            st.subheader("🧠 Description:")
-            st.write(result.strip())
+            if gen is not None:
+                prompt = f"Describe a {label}. Include care tips and personality traits."
+                result = gen(prompt, max_new_tokens=100)
+                st.subheader("🧠 Description:")
+                st.write(result[0]["generated_text"].strip())  # Display the response
+                print(result)  # Print response in logs for debugging
+            else:
+                st.error("Failed to load Falcon model")
         except Exception as e:
             st.error(f"Error generating description: {str(e)}")
     else:
