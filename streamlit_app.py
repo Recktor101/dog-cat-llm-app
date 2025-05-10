@@ -11,12 +11,12 @@ def load_model():
     model.eval()
     return model
 
-# Load text generation model from Hugging Face
+# Load Hugging Face LLM
 @st.cache_resource
 def load_llm():
     return pipeline("text-generation", model="tiiuae/falcon-7b-instruct")
 
-# Preprocess image
+# Preprocess uploaded image
 def preprocess(image):
     transform = transforms.Compose([
         transforms.Resize((224, 224)),
@@ -24,7 +24,7 @@ def preprocess(image):
     ])
     return transform(image).unsqueeze(0)
 
-# Label mapping
+# Map model output index to label
 def get_label(index):
     if 281 <= index <= 285:
         return "cat"
@@ -33,10 +33,10 @@ def get_label(index):
     else:
         return "neither a dog nor a cat"
 
-# UI
-st.title("🐶🐱 Dog or Cat Identifier + AI Description")
+# Streamlit interface
+st.title("🐶🐱 Dog or Cat Identifier + Description")
 
-uploaded_file = st.file_uploader("Upload an image of a dog or cat", type=["jpg", "jpeg", "png"])
+uploaded_file = st.file_uploader("Upload a dog or cat image", type=["jpg", "jpeg", "png"])
 
 if uploaded_file:
     image = Image.open(uploaded_file).convert("RGB")
@@ -56,8 +56,7 @@ if uploaded_file:
         llm = load_llm()
         prompt = f"Describe a {label}. Include care tips and personality traits."
         result = llm(prompt, max_new_tokens=100)[0]["generated_text"]
-
-        st.subheader("🧠 Description:")
+        st.subheader("AI Description:")
         st.write(result.strip())
     else:
-        st.warning("The image does not appear to be a dog or cat.")
+        st.warning("This image doesn't appear to be a dog or a cat.")
