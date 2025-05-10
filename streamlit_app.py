@@ -37,7 +37,7 @@ def generate_breed_description(animal_type, breed_name):
     return prompt
 
 
-st.title("🐶🐱 Dog or Cat Classifier + Flan T5 Response")
+st.title("Dog or Cat Classifier:")
 
 uploaded_file = st.file_uploader("Upload an image of a dog or cat", type=["jpg", "jpeg", "png"])
 
