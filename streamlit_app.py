@@ -11,16 +11,16 @@ def load_model():
     model.eval()
     return model
 
-# Falcon text generation with error handling and debugging
+# Load LLaMA model via Hugging Face API for text generation
 @st.cache_resource
-def load_falcon():
+def load_llama():
     try:
-        st.write("Loading Falcon model...")  # Debug log
-        falcon_model = pipeline("text-generation", model="tiiuae/falcon-7b-instruct")
-        st.write("Falcon model loaded successfully!")  # Debug log
-        return falcon_model
+        st.write("Loading LLaMA model...")  # Debug log
+        llama_model = pipeline("text-generation", model="meta-llama/LLaMA-7B-hf")
+        st.write("LLaMA model loaded successfully!")  # Debug log
+        return llama_model
     except Exception as e:
-        st.error(f"Error loading Falcon model: {e}")
+        st.error(f"Error loading LLaMA model: {e}")
         return None
 
 # Image transform
@@ -61,15 +61,15 @@ if uploaded_file:
 
     if label in ["dog", "cat"]:
         try:
-            gen = load_falcon()  # Load Falcon model
+            gen = load_llama()  # Load LLaMA model
             if gen is not None:
                 prompt = f"Describe a {label}. Include care tips and personality traits."
-                result = gen(prompt, max_new_tokens=100)
+                result = gen(prompt, max_length=100)[0]["generated_text"]
                 st.subheader("🧠 Description:")
-                st.write(result[0]["generated_text"].strip())  # Display the response
+                st.write(result.strip())  # Display the response
                 print(result)  # Print response in logs for debugging
             else:
-                st.error("Failed to load Falcon model")
+                st.error("Failed to load LLaMA model")
         except Exception as e:
             st.error(f"Error generating description: {str(e)}")
     else:
