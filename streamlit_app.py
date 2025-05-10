@@ -11,11 +11,13 @@ def load_model():
     model.eval()
     return model
 
-# Falcon text generation with error handling
+# Falcon text generation with error handling and debugging
 @st.cache_resource
 def load_falcon():
     try:
+        st.write("Loading Falcon model...")  # Debug log
         falcon_model = pipeline("text-generation", model="tiiuae/falcon-7b-instruct")
+        st.write("Falcon model loaded successfully!")  # Debug log
         return falcon_model
     except Exception as e:
         st.error(f"Error loading Falcon model: {e}")
