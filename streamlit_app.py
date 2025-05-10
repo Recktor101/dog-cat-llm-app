@@ -4,19 +4,19 @@ import torch
 from torchvision import transforms
 from transformers import pipeline
 
-# Load image classifier
+# Load a simple image classifier (e.g., ResNet18)
 @st.cache_resource
 def load_model():
     model = torch.hub.load("pytorch/vision", "resnet18", pretrained=True)
     model.eval()
     return model
 
-# Load Hugging Face LLM
+# Load lightweight text generation model (FLAN-T5)
 @st.cache_resource
 def load_llm():
-    return pipeline("text-generation", model="tiiuae/falcon-7b-instruct")
+    return pipeline("text2text-generation", model="google/flan-t5-small")
 
-# Preprocess uploaded image
+# Image transform
 def preprocess(image):
     transform = transforms.Compose([
         transforms.Resize((224, 224)),
@@ -24,7 +24,7 @@ def preprocess(image):
     ])
     return transform(image).unsqueeze(0)
 
-# Map model output index to label
+# Label mapping (ImageNet dog/cat classes)
 def get_label(index):
     if 281 <= index <= 285:
         return "cat"
@@ -33,10 +33,10 @@ def get_label(index):
     else:
         return "neither a dog nor a cat"
 
-# Streamlit interface
-st.title("🐶🐱 Dog or Cat Identifier + Description")
+# Streamlit UI
+st.title("🐶🐱 Dog or Cat Identifier + AI Description")
 
-uploaded_file = st.file_uploader("Upload a dog or cat image", type=["jpg", "jpeg", "png"])
+uploaded_file = st.file_uploader("Upload an image of a dog or cat", type=["jpg", "jpeg", "png"])
 
 if uploaded_file:
     image = Image.open(uploaded_file).convert("RGB")
@@ -56,7 +56,8 @@ if uploaded_file:
         llm = load_llm()
         prompt = f"Describe a {label}. Include care tips and personality traits."
         result = llm(prompt, max_new_tokens=100)[0]["generated_text"]
-        st.subheader("AI Description:")
+
+        st.subheader("🧠 AI-Generated Description:")
         st.write(result.strip())
     else:
-        st.warning("This image doesn't appear to be a dog or a cat.")
+        st.warning("The image does not appear to be a dog or cat.")
