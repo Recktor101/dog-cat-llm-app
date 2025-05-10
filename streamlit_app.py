@@ -3,31 +3,20 @@ from PIL import Image
 import torch
 from torchvision import transforms
 from transformers import pipeline
-from google.colab import drive
-from llama_cpp import Llama
 
-# Mount Google Drive to access the LLaMA model
-drive.mount('/content/drive')
-
-# Path to the LLaMA model in Google Drive
-llama_model_path = '/content/drive/MyDrive/llama_model/llama-2-7b.Q4_K_M.gguf'
-
-# Initialize the LLaMA model
-llama = Llama(model_path=llama_model_path)
-
-# Load a simple image classifier (e.g., a fine-tuned ResNet)
+# Load image classifier
 @st.cache_resource
 def load_model():
     model = torch.hub.load("pytorch/vision", "resnet18", pretrained=True)
     model.eval()
     return model
 
-# Falcon text generation (Fallback model, in case LLaMA fails)
+# Load text generation model from Hugging Face
 @st.cache_resource
-def load_falcon():
+def load_llm():
     return pipeline("text-generation", model="tiiuae/falcon-7b-instruct")
 
-# Image transform
+# Preprocess image
 def preprocess(image):
     transform = transforms.Compose([
         transforms.Resize((224, 224)),
@@ -35,7 +24,7 @@ def preprocess(image):
     ])
     return transform(image).unsqueeze(0)
 
-# Label mapping (ImageNet dog/cat classes)
+# Label mapping
 def get_label(index):
     if 281 <= index <= 285:
         return "cat"
@@ -44,14 +33,8 @@ def get_label(index):
     else:
         return "neither a dog nor a cat"
 
-# Function to generate LLaMA description
-def generate_llama_description(label):
-    prompt = f"Describe a {label}. Include care tips and personality traits."
-    response = llama(prompt)
-    return response['text']
-
-# Streamlit UI
-st.title("🐶🐱 Dog or Cat Identifier + LLaMA Description")
+# UI
+st.title("🐶🐱 Dog or Cat Identifier + AI Description")
 
 uploaded_file = st.file_uploader("Upload an image of a dog or cat", type=["jpg", "jpeg", "png"])
 
@@ -70,21 +53,11 @@ if uploaded_file:
     st.subheader(f"Prediction: **{label.upper()}**")
 
     if label in ["dog", "cat"]:
-        try:
-            # Generate description using LLaMA model
-            description = generate_llama_description(label)
-            st.subheader("🧠 LLaMA Description:")
-            st.write(description.strip())
-        except Exception as e:
-            st.error(f"Error generating description with LLaMA: {e}")
-            st.write("Fallback to Falcon model")
+        llm = load_llm()
+        prompt = f"Describe a {label}. Include care tips and personality traits."
+        result = llm(prompt, max_new_tokens=100)[0]["generated_text"]
 
-            # Fallback to Falcon model in case LLaMA fails
-            gen = load_falcon()
-            prompt = f"Describe a {label}. Include care tips and personality traits."
-            result = gen(prompt, max_new_tokens=100)[0]["generated_text"]
-
-            st.subheader("🧠 Description (Falcon):")
-            st.write(result.strip())
+        st.subheader("🧠 Description:")
+        st.write(result.strip())
     else:
         st.warning("The image does not appear to be a dog or cat.")
