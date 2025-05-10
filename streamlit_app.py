@@ -2,20 +2,23 @@ import streamlit as st
 from PIL import Image
 import torch
 from torchvision import models, transforms
-from transformers import pipeline
+from transformers import AutoTokenizer, AutoModelForCausalLM
 
-# Load the breed classifier model (ResNet50 trained on the ImageNet dataset for general classification)
+# Load LLaMA model (from Google Drive)
+@st.cache_resource
+def load_llama_model():
+    model_path = "/content/drive/MyDrive/llama-model/llama-2-7b.Q4_K_M.gguf"  # Path to LLaMA model on Google Drive
+    tokenizer = AutoTokenizer.from_pretrained(model_path)
+    model = AutoModelForCausalLM.from_pretrained(model_path)
+    model.eval()  # Set the model to evaluation mode
+    return model, tokenizer
+
+# Load the breed classifier model (A specialized dog breed classifier from Hugging Face)
 @st.cache_resource
 def load_breed_classifier():
-    # Load the ResNet50 model
     model = models.resnet50(pretrained=True)
-    model.eval()
+    model.eval()  # Set model to evaluation mode
     return model
-
-# Load the text generation model (Flan-T5 for breed description)
-@st.cache_resource
-def load_text_model():
-    return pipeline("text2text-generation", model="google/flan-t5-base")
 
 # Image transformation function for preprocessing
 def preprocess_image(image):
@@ -26,23 +29,26 @@ def preprocess_image(image):
     ])
     return transform(image).unsqueeze(0)
 
-# Function to classify breed (ResNet50)
+# Function to classify breed (Dog Breed Classifier)
 def classify_breed(model, image):
     input_tensor = preprocess_image(image)
     with torch.no_grad():
         output = model(input_tensor)
     pred_idx = torch.argmax(output).item()
-    
-    # Here we need the label mapping to the actual breed names. We'll use ImageNet classes for now.
-    # Mapping to dog breeds - This mapping can be replaced with more accurate breed names if necessary.
+
+    # You need to load a proper breed-to-index mapping dictionary for dog breeds
     breed_classes = {243: "Chihuahua", 244: "Japanese Chin", 245: "Maltese dog", 246: "Pekingese", 
                      247: "Shih-Tzu", 248: "Yorkshire Terrier", 151: "Labrador Retriever", 152: "Golden Retriever"}  # Example breed mappings
     return breed_classes.get(pred_idx, "Unknown Breed")
 
-# Function to generate a breed-specific description
-def generate_breed_description(breed_name):
+# Function to generate a breed-specific description using LLaMA model
+def generate_breed_description(model, tokenizer, breed_name):
     prompt = f"Please provide a detailed description of a {breed_name}. Include its physical traits, personality, care tips, and history."
-    return prompt
+    inputs = tokenizer(prompt, return_tensors="pt")
+    with torch.no_grad():
+        outputs = model.generate(inputs['input_ids'], max_length=150, num_return_sequences=1)
+    generated_text = tokenizer.decode(outputs[0], skip_special_tokens=True)
+    return generated_text
 
 # Streamlit UI
 st.title("🐶🐱 Dog or Cat Classifier + Breed Description Generator")
@@ -59,17 +65,16 @@ if uploaded_file:
     # Predict breed of the uploaded image
     breed_name = classify_breed(breed_classifier, image)
 
-    # Generate breed-specific description
-    prompt = generate_breed_description(breed_name)
+    # Load LLaMA model for text generation
+    llama_model, llama_tokenizer = load_llama_model()
 
-    # Load text generation model (Flan-T5 or another model)
-    text_model = load_text_model()
-    result = text_model(prompt, max_new_tokens=200, temperature=0.7)[0]["generated_text"]
+    # Generate breed-specific description using LLaMA
+    description = generate_breed_description(llama_model, llama_tokenizer, breed_name)
 
     # Display breed description
     st.subheader(f"Prediction: **{breed_name.upper()}**")
     st.subheader("🧠 AI-Generated Breed Description:")
-    st.write(result.strip())
+    st.write(description.strip())
 
 else:
     st.warning("Please upload an image of a dog or cat.")
