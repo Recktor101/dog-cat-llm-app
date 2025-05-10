@@ -3,6 +3,17 @@ from PIL import Image
 import torch
 from torchvision import transforms
 from transformers import pipeline
+from google.colab import drive
+from llama_cpp import Llama
+
+# Mount Google Drive to access the LLaMA model
+drive.mount('/content/drive')
+
+# Path to the LLaMA model in Google Drive
+llama_model_path = '/content/drive/MyDrive/llama_model/llama-2-7b.Q4_K_M.gguf'
+
+# Initialize the LLaMA model
+llama = Llama(model_path=llama_model_path)
 
 # Load a simple image classifier (e.g., a fine-tuned ResNet)
 @st.cache_resource
@@ -11,17 +22,10 @@ def load_model():
     model.eval()
     return model
 
-# Load LLaMA model via Hugging Face API for text generation
+# Falcon text generation (Fallback model, in case LLaMA fails)
 @st.cache_resource
-def load_llama():
-    try:
-        st.write("Loading LLaMA model...")  # Debug log
-        llama_model = pipeline("text-generation", model="meta-llama/LLaMA-7B-hf")
-        st.write("LLaMA model loaded successfully!")  # Debug log
-        return llama_model
-    except Exception as e:
-        st.error(f"Error loading LLaMA model: {e}")
-        return None
+def load_falcon():
+    return pipeline("text-generation", model="tiiuae/falcon-7b-instruct")
 
 # Image transform
 def preprocess(image):
@@ -39,6 +43,12 @@ def get_label(index):
         return "dog"
     else:
         return "neither a dog nor a cat"
+
+# Function to generate LLaMA description
+def generate_llama_description(label):
+    prompt = f"Describe a {label}. Include care tips and personality traits."
+    response = llama(prompt)
+    return response['text']
 
 # Streamlit UI
 st.title("🐶🐱 Dog or Cat Identifier + LLaMA Description")
@@ -61,16 +71,20 @@ if uploaded_file:
 
     if label in ["dog", "cat"]:
         try:
-            gen = load_llama()  # Load LLaMA model
-            if gen is not None:
-                prompt = f"Describe a {label}. Include care tips and personality traits."
-                result = gen(prompt, max_length=100)[0]["generated_text"]
-                st.subheader("🧠 Description:")
-                st.write(result.strip())  # Display the response
-                print(result)  # Print response in logs for debugging
-            else:
-                st.error("Failed to load LLaMA model")
+            # Generate description using LLaMA model
+            description = generate_llama_description(label)
+            st.subheader("🧠 LLaMA Description:")
+            st.write(description.strip())
         except Exception as e:
-            st.error(f"Error generating description: {str(e)}")
+            st.error(f"Error generating description with LLaMA: {e}")
+            st.write("Fallback to Falcon model")
+
+            # Fallback to Falcon model in case LLaMA fails
+            gen = load_falcon()
+            prompt = f"Describe a {label}. Include care tips and personality traits."
+            result = gen(prompt, max_new_tokens=100)[0]["generated_text"]
+
+            st.subheader("🧠 Description (Falcon):")
+            st.write(result.strip())
     else:
         st.warning("The image does not appear to be a dog or cat.")
