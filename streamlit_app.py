@@ -34,7 +34,7 @@ def get_label(index):
         return "neither a dog nor a cat"
 
 # Streamlit UI
-st.title("🐶🐱 Dog or Cat Identifier + AI Description")
+st.title("🐶🐱 Dog or Cat Identifier + Llama Description")
 
 uploaded_file = st.file_uploader("Upload an image of a dog or cat", type=["jpg", "jpeg", "png"])
 
