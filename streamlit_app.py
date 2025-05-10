@@ -2,14 +2,14 @@ import streamlit as st
 from PIL import Image
 import torch
 from torchvision import models, transforms
-from transformers import AutoTokenizer, AutoModelForCausalLM
+from transformers import LlamaTokenizer, LlamaForCausalLM
 
 # Load LLaMA model (from Google Drive)
 @st.cache_resource
 def load_llama_model():
-    model_path = "/content/drive/MyDrive/llama-model/llama-2-7b.Q4_K_M.gguf"  # Path to LLaMA model on Google Drive
-    tokenizer = AutoTokenizer.from_pretrained(model_path)
-    model = AutoModelForCausalLM.from_pretrained(model_path)
+    model_path = "/content/drive/MyDrive/llama-model/llama-2-7b.Q4_K_M"  # Path to LLaMA model on Google Drive
+    tokenizer = LlamaTokenizer.from_pretrained(model_path)
+    model = LlamaForCausalLM.from_pretrained(model_path)
     model.eval()  # Set the model to evaluation mode
     return model, tokenizer
 
