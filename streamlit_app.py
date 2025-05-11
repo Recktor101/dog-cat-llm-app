@@ -1,21 +1,8 @@
-import os
 import streamlit as st
 from PIL import Image
 import torch
 from torchvision import models, transforms
-from transformers import T5Tokenizer, T5ForConditionalGeneration  # Using Flan-T5 model
-
-# Ensure transformers and torch are installed
-os.system("pip install transformers torch")
-
-# Load Flan-T5 model (from Hugging Face)
-@st.cache_resource
-def load_flan_t5_model():
-    model_name = "google/flan-t5-small"  # Hugging Face model name for Flan-T5
-    tokenizer = T5Tokenizer.from_pretrained(model_name)
-    model = T5ForConditionalGeneration.from_pretrained(model_name)
-    model.eval()  # Set the model to evaluation mode
-    return model, tokenizer
+from transformers import T5Tokenizer, T5ForConditionalGeneration
 
 # Load the breed classifier model (A specialized dog breed classifier from Hugging Face)
 @st.cache_resource
@@ -23,6 +10,15 @@ def load_breed_classifier():
     model = models.resnet50(pretrained=True)
     model.eval()  # Set model to evaluation mode
     return model
+
+# Load Flan-T5 model (for generating breed descriptions)
+@st.cache_resource
+def load_flan_t5_model():
+    model_name = "google/flan-t5-small"
+    model = T5ForConditionalGeneration.from_pretrained(model_name)
+    tokenizer = T5Tokenizer.from_pretrained(model_name)
+    model.eval()
+    return model, tokenizer
 
 # Image transformation function for preprocessing
 def preprocess_image(image):
@@ -40,9 +36,9 @@ def classify_breed(model, image):
         output = model(input_tensor)
     pred_idx = torch.argmax(output).item()
 
-    # You need to load a proper breed-to-index mapping dictionary for dog breeds
+    # Example breed mappings
     breed_classes = {243: "Chihuahua", 244: "Japanese Chin", 245: "Maltese dog", 246: "Pekingese", 
-                     247: "Shih-Tzu", 248: "Yorkshire Terrier", 151: "Labrador Retriever", 152: "Golden Retriever"}  # Example breed mappings
+                     247: "Shih-Tzu", 248: "Yorkshire Terrier", 151: "Labrador Retriever", 152: "Golden Retriever"}
     return breed_classes.get(pred_idx, "Unknown Breed")
 
 # Function to generate a breed-specific description using Flan-T5 model
