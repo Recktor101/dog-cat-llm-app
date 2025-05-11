@@ -2,14 +2,14 @@ import streamlit as st
 from PIL import Image
 import torch
 from torchvision import models, transforms
-from transformers import GPT2LMHeadModel, GPT2Tokenizer, BlipProcessor, BlipForConditionalGeneration
+from transformers import T5ForConditionalGeneration, T5Tokenizer, BlipProcessor, BlipForConditionalGeneration
 
-# Load GPT-2 model (for breed descriptions)
+# Load Flan-T5 model (for breed descriptions)
 @st.cache_resource
-def load_gpt2_model():
-    model_name = "gpt2"  # Hugging Face model name for GPT-2
-    tokenizer = GPT2Tokenizer.from_pretrained(model_name)
-    model = GPT2LMHeadModel.from_pretrained(model_name)
+def load_flan_t5_model():
+    model_name = "google/flan-t5-small"  # Hugging Face model name for Flan-T5
+    tokenizer = T5Tokenizer.from_pretrained(model_name)
+    model = T5ForConditionalGeneration.from_pretrained(model_name)
     model.eval()  # Set the model to evaluation mode
     return model, tokenizer
 
@@ -48,7 +48,7 @@ def classify_breed(model, image):
                      247: "Shih-Tzu", 248: "Yorkshire Terrier", 151: "Labrador Retriever", 152: "Golden Retriever"}  # Example breed mappings
     return breed_classes.get(pred_idx, "Unknown Breed")
 
-# Function to generate breed-specific description using GPT-2
+# Function to generate breed-specific description using Flan-T5
 def generate_breed_description(model, tokenizer, breed_name):
     prompt = f"Describe a {breed_name} dog. Include physical traits, personality, care tips, and history."
     inputs = tokenizer(prompt, return_tensors="pt")
@@ -81,11 +81,11 @@ if uploaded_file:
     # Predict breed of the uploaded image
     breed_name = classify_breed(breed_classifier, image)
 
-    # Load GPT-2 model for breed description generation
-    gpt2_model, gpt2_tokenizer = load_gpt2_model()
+    # Load Flan-T5 model for breed description generation
+    flan_t5_model, flan_t5_tokenizer = load_flan_t5_model()
 
-    # Generate breed-specific description using GPT-2
-    description = generate_breed_description(gpt2_model, gpt2_tokenizer, breed_name)
+    # Generate breed-specific description using Flan-T5
+    description = generate_breed_description(flan_t5_model, flan_t5_tokenizer, breed_name)
 
     # Display the breed classification and description
     st.subheader(f"Prediction: **{breed_name.upper()}**")
