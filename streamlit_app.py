@@ -34,7 +34,7 @@ def get_label(index):
         return "neither a dog nor a cat"
 
 # Streamlit UI
-st.title("🐶🐱 Dog or Cat Classifier + Description Generator")
+st.title("Dog or Cat Classifier + Description Generator")
 
 uploaded_file = st.file_uploader("Upload an image of a dog or cat", type=["jpg", "jpeg", "png"])
 
@@ -57,7 +57,7 @@ if uploaded_file:
         prompt = f"Write a detailed description of a {label}. Include its most common breeds, behavior traits, and care tips. Make sure it is informative and written in a natural, friendly tone."
         result = gen(prompt, max_new_tokens=200, temperature=0.7)[0]["generated_text"]
 
-        st.subheader("🧠 AI-Generated Description:")
+        st.subheader("T5 Flan Description:")
         st.write(result.strip())
     else:
         st.warning("The image does not appear to be a dog or cat.")
