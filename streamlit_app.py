@@ -5,14 +5,12 @@ from torchvision import models, transforms
 from transformers import T5Tokenizer, T5ForConditionalGeneration
 
 # Load the breed classifier model (A specialized dog breed classifier from Hugging Face)
-@st.cache_resource
 def load_breed_classifier():
     model = models.resnet50(pretrained=True)
     model.eval()  # Set model to evaluation mode
     return model
 
 # Load Flan-T5 model (for generating breed descriptions)
-@st.cache_resource
 def load_flan_t5_model():
     model_name = "google/flan-t5-small"
     model = T5ForConditionalGeneration.from_pretrained(model_name)
