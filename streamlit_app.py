@@ -2,25 +2,32 @@ import streamlit as st
 from PIL import Image
 import torch
 from torchvision import models, transforms
-from transformers import LlamaTokenizer, LlamaForCausalLM
+from transformers import GPT2LMHeadModel, GPT2Tokenizer, BlipProcessor, BlipForConditionalGeneration
 
-# Load LLaMA model (from Google Drive)
+# Load GPT-2 model (for breed descriptions)
 @st.cache_resource
-def load_llama_model():
-    model_path = "/content/drive/MyDrive/llama-model/llama-2-7b.Q4_K_M"  # Path to LLaMA model on Google Drive
-    tokenizer = LlamaTokenizer.from_pretrained(model_path)
-    model = LlamaForCausalLM.from_pretrained(model_path)
+def load_gpt2_model():
+    model_name = "gpt2"  # Hugging Face model name for GPT-2
+    tokenizer = GPT2Tokenizer.from_pretrained(model_name)
+    model = GPT2LMHeadModel.from_pretrained(model_name)
     model.eval()  # Set the model to evaluation mode
     return model, tokenizer
 
-# Load the breed classifier model (A specialized dog breed classifier from Hugging Face)
+# Load BLIP model (for image captioning)
+@st.cache_resource
+def load_blip_model():
+    processor = BlipProcessor.from_pretrained("Salesforce/blip-image-captioning-base")
+    model = BlipForConditionalGeneration.from_pretrained("Salesforce/blip-image-captioning-base")
+    return processor, model
+
+# Load the breed classifier model (using ResNet50 for dog breed classification)
 @st.cache_resource
 def load_breed_classifier():
     model = models.resnet50(pretrained=True)
     model.eval()  # Set model to evaluation mode
     return model
 
-# Image transformation function for preprocessing
+# Image transformation function for preprocessing (ResNet50 input)
 def preprocess_image(image):
     transform = transforms.Compose([
         transforms.Resize((224, 224)),  # Resize image for model input
@@ -41,40 +48,59 @@ def classify_breed(model, image):
                      247: "Shih-Tzu", 248: "Yorkshire Terrier", 151: "Labrador Retriever", 152: "Golden Retriever"}  # Example breed mappings
     return breed_classes.get(pred_idx, "Unknown Breed")
 
-# Function to generate a breed-specific description using LLaMA model
+# Function to generate breed-specific description using GPT-2
 def generate_breed_description(model, tokenizer, breed_name):
-    prompt = f"Please provide a detailed description of a {breed_name}. Include its physical traits, personality, care tips, and history."
+    prompt = f"Describe a {breed_name} dog. Include physical traits, personality, care tips, and history."
     inputs = tokenizer(prompt, return_tensors="pt")
     with torch.no_grad():
         outputs = model.generate(inputs['input_ids'], max_length=150, num_return_sequences=1)
     generated_text = tokenizer.decode(outputs[0], skip_special_tokens=True)
     return generated_text
 
+# Function to generate an image caption using BLIP
+def generate_image_caption(processor, model, image):
+    inputs = processor(images=image, return_tensors="pt")
+    out = model.generate(**inputs)
+    caption = processor.decode(out[0], skip_special_tokens=True)
+    return caption
+
 # Streamlit UI
 st.title("🐶🐱 Dog or Cat Classifier + Breed Description Generator")
 
+# File uploader to upload the image
 uploaded_file = st.file_uploader("Upload an image of a dog or cat", type=["jpg", "jpeg", "png"])
 
 if uploaded_file:
+    # Open and display the uploaded image
     image = Image.open(uploaded_file).convert("RGB")
     st.image(image, caption="Uploaded Image", use_column_width=True)
 
-    # Load the breed classification model
+    # Load the breed classifier model
     breed_classifier = load_breed_classifier()
 
     # Predict breed of the uploaded image
     breed_name = classify_breed(breed_classifier, image)
 
-    # Load LLaMA model for text generation
-    llama_model, llama_tokenizer = load_llama_model()
+    # Load GPT-2 model for breed description generation
+    gpt2_model, gpt2_tokenizer = load_gpt2_model()
 
-    # Generate breed-specific description using LLaMA
-    description = generate_breed_description(llama_model, llama_tokenizer, breed_name)
+    # Generate breed-specific description using GPT-2
+    description = generate_breed_description(gpt2_model, gpt2_tokenizer, breed_name)
 
-    # Display breed description
+    # Display the breed classification and description
     st.subheader(f"Prediction: **{breed_name.upper()}**")
     st.subheader("🧠 AI-Generated Breed Description:")
     st.write(description.strip())
+
+    # Load BLIP model for image captioning
+    blip_processor, blip_model = load_blip_model()
+
+    # Generate a caption for the uploaded image
+    image_caption = generate_image_caption(blip_processor, blip_model, image)
+
+    # Display the AI-generated image caption
+    st.subheader("🖼️ AI-Generated Image Caption:")
+    st.write(image_caption.strip())
 
 else:
     st.warning("Please upload an image of a dog or cat.")
