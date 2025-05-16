@@ -118,3 +118,8 @@ Mexican_hairless
 Dingo
 Dhole
 African_hunting_dog
+Siamese_cat
+Persian_cat
+Maine_coon_cat
+Ragdoll_cat
+Bengal_cat
