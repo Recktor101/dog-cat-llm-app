@@ -1,7 +1,12 @@
+import streamlit as st
+from PIL import Image
 from model import predict_image
 from description_model import get_breed_description
 
-# ... previous code ...
+st.set_page_config(page_title="Dog/Cat Breed Classifier", layout="centered")
+
+st.title("🐶🐱 Dog or Cat Classifier with Breed Info")
+uploaded_file = st.file_uploader("Upload an image of a dog or cat", type=["jpg", "jpeg", "png"])
 
 if uploaded_file:
     image = Image.open(uploaded_file)
