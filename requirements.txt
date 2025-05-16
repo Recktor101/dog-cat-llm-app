@@ -1,6 +1,6 @@
 streamlit
 torch
-timm
+torchvision
 transformers
 Pillow
 scikit-learn
