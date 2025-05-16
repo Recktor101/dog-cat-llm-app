@@ -1,8 +1,9 @@
 from transformers import pipeline
 
-generator = pipeline("text2text-generation", model="google/flan-t5-large")
+# Hugging Face summarization model (you can replace with a better model later)
+description_generator = pipeline("text-generation", model="tiiuae/falcon-7b-instruct", device=0 if torch.cuda.is_available() else -1)
 
-def generate_breed_description(breed_name):
-    prompt = f"Give a detailed description of the {breed_name} dog breed, including appearance, personality, and care tips."
-    output = generator(prompt, max_length=150, do_sample=False)[0]["generated_text"]
-    return output
+def generate_description(breed):
+    prompt = f"Describe the breed '{breed}' in detail, including its size, personality, and ideal environment."
+    result = description_generator(prompt, max_new_tokens=60, do_sample=True)[0]['generated_text']
+    return result.strip()
