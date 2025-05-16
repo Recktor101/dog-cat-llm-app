@@ -1,25 +1,25 @@
 import torch
-import torchvision.transforms as transforms
-from torchvision import models
 from PIL import Image
+from torchvision import transforms
+import timm
 
-# Load pretrained ResNet50 model
-model = models.resnet50(pretrained=True)
+# Load model with 120 breed classes
+model = timm.create_model('tf_efficientnet_b2_ns', pretrained=True, num_classes=120)
 model.eval()
 
-# Breed labels for example purposes (you can expand this)
-breed_labels = ['Beagle', 'Chihuahua', 'Doberman', 'French Bulldog', 'Golden Retriever', 'Maltese', 'Pug', 'Shih-Tzu']
+# Load breed labels
+with open("breed_labels.txt", "r") as f:
+    breed_labels = [line.strip() for line in f.readlines()]
 
+# Preprocessing
 transform = transforms.Compose([
     transforms.Resize((224, 224)),
     transforms.ToTensor(),
 ])
 
-def predict_image(image: Image.Image):
-    img = transform(image).unsqueeze(0)  # Add batch dimension
+def predict_dog_breed(image: Image.Image):
+    img = transform(image).unsqueeze(0)
     with torch.no_grad():
-        outputs = model(img)
-    _, predicted = torch.max(outputs, 1)
-    # Fake logic: just return breed for example
-    breed = breed_labels[predicted.item() % len(breed_labels)]
-    return "DOG", breed  # Always assume it's a dog for simplicity
+        logits = model(img)
+        pred_idx = logits.argmax(dim=1).item()
+    return breed_labels[pred_idx]
