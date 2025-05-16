@@ -1,0 +1,14 @@
+import torch
+import torch.nn as nn
+
+class DummyModel(nn.Module):
+    def __init__(self, num_classes=120):
+        super().__init__()
+        self.fc = nn.Linear(224*224*3, num_classes)
+    def forward(self, x):
+        x = x.view(x.size(0), -1)
+        return self.fc(x)
+
+dummy_model = DummyModel()
+torch.save(dummy_model, "model.pth")
+print("Dummy model.pth created")
