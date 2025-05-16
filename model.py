@@ -2,13 +2,15 @@ import torch
 import torchvision.transforms as transforms
 from torchvision import models
 from PIL import Image
+import urllib.request
 
 # Load pretrained ResNet50 model
 model = models.resnet50(pretrained=True)
 model.eval()
 
-# Breed labels for example purposes (you can expand this)
-breed_labels = ['Beagle', 'Chihuahua', 'Doberman', 'French Bulldog', 'Golden Retriever', 'Maltese', 'Pug', 'Shih-Tzu']
+# Download actual ImageNet class labels
+url = "https://raw.githubusercontent.com/pytorch/hub/master/imagenet_classes.txt"
+labels = urllib.request.urlopen(url).read().decode("utf-8").splitlines()
 
 transform = transforms.Compose([
     transforms.Resize((224, 224)),
@@ -16,10 +18,15 @@ transform = transforms.Compose([
 ])
 
 def predict_image(image: Image.Image):
-    img = transform(image).unsqueeze(0)  # Add batch dimension
+    img = transform(image).unsqueeze(0)
     with torch.no_grad():
         outputs = model(img)
-    _, predicted = torch.max(outputs, 1)
-    # Fake logic: just return breed for example
-    breed = breed_labels[predicted.item() % len(breed_labels)]
-    return "DOG", breed  # Always assume it's a dog for simplicity
+        probs = torch.nn.functional.softmax(outputs[0], dim=0)
+
+    confidence, predicted_idx = torch.max(probs, 0)
+    predicted_label = labels[predicted_idx.item()]
+
+    if "dog" in predicted_label.lower():
+        return "DOG", predicted_label, confidence.item()
+    else:
+        return "CAT or UNKNOWN", predicted_label, confidence.item()
