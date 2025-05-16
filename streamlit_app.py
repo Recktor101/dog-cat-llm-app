@@ -3,24 +3,29 @@ from PIL import Image
 import torch
 from torchvision import transforms
 from transformers import pipeline
+import json
+import requests
 
-# Load the image classifier (ResNet18)
+# Load ImageNet class index mapping (ID to class name)
+@st.cache_resource
+def load_imagenet_labels():
+    url = "https://raw.githubusercontent.com/anishathalye/imagenet-simple-labels/master/imagenet-simple-labels.json"
+    labels = requests.get(url).json()
+    return labels
+
+# Load ResNet18 model
 @st.cache_resource
 def load_image_model():
     model = torch.hub.load("pytorch/vision", "resnet18", pretrained=True)
     model.eval()
     return model
 
-# Load Flan-T5-Large from Hugging Face for text generation
+# Load Flan-T5 model for text generation
 @st.cache_resource
 def load_text_model():
-    return pipeline(
-        "text2text-generation",
-        model="google/flan-t5-large",
-        device=0 if torch.cuda.is_available() else -1,  # use GPU if available
-    )
+    return pipeline("text2text-generation", model="google/flan-t5-large")
 
-# Preprocess the uploaded image
+# Image preprocessing
 def preprocess(image):
     transform = transforms.Compose([
         transforms.Resize((224, 224)),
@@ -28,17 +33,30 @@ def preprocess(image):
     ])
     return transform(image).unsqueeze(0)
 
-# Identify if it's a dog, cat, or neither based on ImageNet class index
+# Get label type based on ImageNet class index
 def get_label(index):
     if 281 <= index <= 285:
         return "cat"
     elif 151 <= index <= 268:
         return "dog"
     else:
-        return "neither a dog nor a cat"
+        return "neither"
 
-# Main Streamlit app
-st.title("Dog or Cat Classifier + Breed Description Generator")
+# Dog & cat breed descriptions fallback dictionary (expand as needed)
+breed_descriptions = {
+    "french_bulldog": "The French Bulldog is a small muscular dog with a smooth coat, compact build, and a friendly, playful personality. They require moderate exercise and enjoy companionship.",
+    "golden_retriever": "The Golden Retriever is a large, friendly dog known for its intelligence, loyalty, and gentle temperament. They need plenty of exercise and social interaction.",
+    "tabby_cat": "Tabby cats have distinctive stripes, dots, or swirling patterns. They are affectionate, playful, and make great family pets.",
+    "siamese_cat": "Siamese cats are known for their striking blue eyes, vocal nature, and affectionate personality. They thrive on social interaction and mental stimulation.",
+    # Add more breed descriptions here...
+}
+
+# Convert ImageNet class name to key for breed_descriptions dictionary
+def class_to_key(class_name):
+    return class_name.lower().replace(" ", "_").replace("-", "_")
+
+# Main Streamlit UI
+st.title("Dog or Cat Classifier + Description Generator")
 
 uploaded_file = st.file_uploader("Upload an image of a dog or cat", type=["jpg", "jpeg", "png"])
 
@@ -46,34 +64,34 @@ if uploaded_file:
     image = Image.open(uploaded_file).convert("RGB")
     st.image(image, caption="Uploaded Image", use_column_width=True)
 
+    labels = load_imagenet_labels()
     model = load_image_model()
     input_tensor = preprocess(image)
 
     with torch.no_grad():
         output = model(input_tensor)
     pred_idx = torch.argmax(output).item()
+    class_name = labels[pred_idx]
 
-    label = get_label(pred_idx)
-    st.subheader(f"Prediction: **{label.upper()}**")
+    label_type = get_label(pred_idx)
+    st.subheader(f"Prediction: **{label_type.upper()}** ({class_name})")
 
-    if label in ["dog", "cat"]:
-        gen = load_text_model()
-        prompt = (
-            f"You are a friendly and knowledgeable pet expert. "
-            f"Write a detailed, engaging, and natural description about the {label} breed. "
-            f"Include common breeds, personality traits, behavior, and care tips. "
-            f"Keep it informative and fun to read, without repeating phrases."
-        )
-        result = gen(
-            prompt,
-            max_new_tokens=350,
-            temperature=0.7,
-            repetition_penalty=1.2,
-        )[0]["generated_text"]
-
-        st.subheader("Breed Description:")
-        st.write(result.strip())
+    if label_type in ["dog", "cat"]:
+        key = class_to_key(class_name)
+        if key in breed_descriptions:
+            # Use the dictionary description
+            description = breed_descriptions[key]
+            st.subheader("Breed Description (From database):")
+            st.write(description)
+        else:
+            # If no dictionary entry, use Flan-T5 to generate description
+            gen = load_text_model()
+            prompt = (
+                f"Provide a detailed and natural description of the {class_name}. "
+                "Include common traits, behavior, and care tips."
+            )
+            result = gen(prompt, max_new_tokens=200, temperature=0.7)[0]["generated_text"]
+            st.subheader("Breed Description (Generated by Flan-T5):")
+            st.write(result.strip())
     else:
         st.warning("The image does not appear to be a dog or cat.")
-else:
-    st.info("Please upload an image to get started.")
