@@ -1,45 +1,37 @@
 import torch
-from torchvision import transforms
+import torchvision.transforms as transforms
 from PIL import Image
 
-# Load breed labels once
+# Load breed labels
 with open('breed_labels.txt', 'r') as f:
     breed_labels = [line.strip() for line in f.readlines()]
 
-# Load your pretrained model file (make sure model.pth is in your repo)
+# Load the trained model
 model = torch.load('model.pth', map_location='cpu')
 model.eval()
 
-# Image transform pipeline
+# Image transforms (adjust to your model training)
 transform = transforms.Compose([
     transforms.Resize((224, 224)),
     transforms.ToTensor(),
-    # Normalize if your model expects it, example:
-    # transforms.Normalize(mean=[0.485, 0.456, 0.406],
-    #                      std=[0.229, 0.224, 0.225]),
+    transforms.Normalize(mean=[0.485, 0.456, 0.406],
+                         std=[0.229, 0.224, 0.225])
 ])
 
 def predict_breed(image_path):
-    # Open and transform image
-    img = Image.open(image_path).convert('RGB')
-    input_tensor = transform(img).unsqueeze(0)  # add batch dim
+    image = Image.open(image_path).convert('RGB')
+    img_t = transform(image)
+    batch_t = torch.unsqueeze(img_t, 0)
 
     with torch.no_grad():
-        outputs = model(input_tensor)
-        preds = torch.softmax(outputs, dim=1).cpu().numpy()[0]
+        out = model(batch_t)
+        probs = torch.nn.functional.softmax(out, dim=1)
+        confidence, idx = torch.max(probs, 1)
 
-    idx = preds.argmax()
-    confidence = preds[idx]
+    breed = breed_labels[idx.item()]
+    confidence_percent = confidence.item() * 100
 
-    if idx >= len(breed_labels):
-        raise ValueError(f"Prediction index {idx} out of range for breed labels")
+    # Basic description example
+    description = f"The image is predicted as a {breed.replace('_', ' ')} with confidence {confidence_percent:.2f}%."
 
-    breed = breed_labels[idx]
-
-    # More detailed description example (customize as you want)
-    description = (
-        f"The {breed.replace('_', ' ')} is a lovely breed known for its unique characteristics. "
-        f"This prediction has a confidence of {confidence*100:.2f}%."
-    )
-
-    return breed, description, confidence
+    return breed, description, confidence_percent
