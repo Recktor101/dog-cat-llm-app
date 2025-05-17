@@ -3,28 +3,21 @@ from PIL import Image
 from model import predict_image
 from description_model import get_breed_description
 
-# Set page config
+# Set page configuration
 st.set_page_config(page_title="Dog/Cat Classifier", layout="centered")
 
-# Centered logo at top
+# Display the centered logo
 st.markdown(
     """
-    <div style="text-align:center;">
-        <img src="https://raw.githubusercontent.com/your-username/your-repo/main/assets/llmatscale-logo.png" width="250"/>
+    <div style="text-align: center; margin-bottom: 20px;">
+        <img src="https://raw.githubusercontent.com/Recktor101/dog-cat-llm-app/main/assets/llmatscale-logo.png" width="250">
     </div>
     """,
-    unsafe_allow_html=True,
+    unsafe_allow_html=True
 )
 
-# Optional subheading like in example
-st.markdown(
-    """
-    <h3 style="text-align:center;">Dog/Cat Image Classifier with Breed Prediction</h3>
-    <p style="text-align:center;"><a href="#">GEN AI Bootcamp 2025</a></p>
-    <hr>
-    """,
-    unsafe_allow_html=True,
-)
+# App title
+st.title("🐶🐱 Dog or Cat Classifier with Breed Info")
 
 # File uploader
 uploaded_file = st.file_uploader("Upload an image of a dog or cat", type=["jpg", "jpeg", "png"])
