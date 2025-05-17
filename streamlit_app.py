@@ -3,60 +3,23 @@ from PIL import Image
 from model import predict_image
 from description_model import get_breed_description
 
+# Set page config
 st.set_page_config(page_title="Dog and Cat Image Classifier", layout="centered")
 
-# CSS to style uploader and layout
+# Inject CSS for black background and white text site-wide
 st.markdown(
     """
     <style>
-    /* Style the file uploader button */
-    div[data-testid="fileUploaderDropzone"] > label {
-        max-width: 180px !important;  /* wider button */
-        font-size: 14px !important;
-        padding: 0.4rem 1rem !important;
-        white-space: nowrap;
-        cursor: pointer;
-        border-radius: 8px;
-        border: 1px solid #555;
-        background-color: #222;
+    .main {
+        background-color: black;
         color: white;
-        margin-left: 10px !important; /* small gap to the left text */
-        display: inline-block;
-    }
-
-    /* Keep uploader height default */
-    div[data-testid="fileUploaderDropzone"] {
-        height: auto !important;
-        display: inline-block;
-    }
-
-    /* Container to align label and uploader horizontally and center vertically */
-    .upload-container {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 8px; /* small gap between label and uploader */
-        margin-bottom: 20px;
-    }
-
-    /* Style for upload label */
-    .upload-label {
-        font-size: 18px;
-        font-weight: 500;
-        color: white;
-        white-space: nowrap;
-    }
-
-    /* White horizontal line */
-    hr {
-        border-color: white !important;
     }
     </style>
     """,
     unsafe_allow_html=True,
 )
 
-# Header with logo and title (dark blue)
+# Header with centered logo and white title text, no background color set explicitly
 st.markdown(
     """
     <div style="text-align: center; margin-bottom: 5px;">
@@ -64,33 +27,16 @@ st.markdown(
         <div style="font-size: 10px; color: lightgray; margin-top: 4px;">
             LLM at Scale
         </div>
-        <div style="font-size: 24px; font-weight: 700; color: #003366; margin-top: 8px;">
+        <div style="font-size: 24px; font-weight: 700; color: #FFFFFF; margin-top: 8px;">
             Dog and Cat Image Classifier
         </div>
     </div>
-    <hr style="margin-top: 10px; margin-bottom: 20px;">
+    <hr style="margin-top: 10px; margin-bottom: 20px; border-color: white;">
     """,
-    unsafe_allow_html=True,
+    unsafe_allow_html=True
 )
 
-# Custom upload container
-st.markdown(
-    """
-    <div class="upload-container">
-        <div class="upload-label">Upload an image of a dog or cat</div>
-    </div>
-    """,
-    unsafe_allow_html=True,
-)
-
-# Create a container to hold the uploader and align with label
-cols = st.columns([4, 1])
-
-with cols[0]:
-    st.write("")  # Empty to align uploader right
-
-with cols[1]:
-    uploaded_file = st.file_uploader("", type=["jpg", "jpeg", "png"], key="uploader")
+uploaded_file = st.file_uploader("Upload an image of a dog or cat", type=["jpg", "jpeg", "png"])
 
 if uploaded_file:
     image = Image.open(uploaded_file)
