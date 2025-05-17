@@ -1,4 +1,4 @@
-port streamlit as st
+import streamlit as st
 from PIL import Image
 from model import predict_image
 from description_model import get_breed_description
