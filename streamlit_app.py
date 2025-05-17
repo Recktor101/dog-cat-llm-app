@@ -5,20 +5,37 @@ from description_model import get_breed_description
 
 st.set_page_config(page_title="Dog and Cat Image Classifier", layout="centered")
 
-# CSS to shrink the drag and drop area/button, make line white, adjust spacing and size
+# CSS styles
 st.markdown(
     """
     <style>
-    /* Shrink and widen the file uploader label/button */
+    /* Make the file uploader smaller in width and taller in height, vertical text label */
     div[data-testid="fileUploaderDropzone"] > label {
-        padding: 0.3rem 1rem !important;  /* more horizontal padding for width */
-        font-size: 14px !important;       /* slightly bigger text */
-        max-width: 180px;                 /* wider to fit label */
-        white-space: nowrap;              /* keep label on one line */
-        margin-left: 8px !important;     /* closer to the left text */
+        width: 90px !important;
+        height: 70px !important;
+        padding: 0.4rem !important;
+        font-size: 14px !important;
+        writing-mode: vertical-rl;
+        text-orientation: mixed;
+        display: flex !important;
+        justify-content: center;
+        align-items: center;
+        white-space: nowrap;
         cursor: pointer;
+        background-color: #f0f0f0;
+        border-radius: 8px;
+        border: 1px solid #ddd;
+        color: #444;
+        user-select: none;
+        margin-left: 8px !important;
     }
-    /* Make horizontal line white */
+
+    /* Hide the default file input text to just show custom label */
+    input[type="file"] {
+        display: none !important;
+    }
+
+    /* White horizontal line */
     hr {
         border-color: white !important;
     }
@@ -27,7 +44,7 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
-# Header with logo and title (title stays dark blue)
+# Header with logo and title (dark blue)
 st.markdown(
     """
     <div style="text-align: center; margin-bottom: 5px;">
@@ -44,13 +61,13 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
-# Create two columns: label left, uploader right, reduce gap
+# Two columns: label text left, vertical drag-and-drop file uploader right
 col1, col2 = st.columns([4,1])
 
 with col1:
     st.markdown(
         """
-        <div style="display: flex; align-items: center; height: 100%;">
+        <div style="display: flex; align-items: center; height: 70px;">
             <span style="font-size: 18px; font-weight: 500; color: white;">
                 Upload an image of a dog or cat
             </span>
