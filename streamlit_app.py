@@ -6,7 +6,7 @@ from description_model import get_breed_description
 # Set page config
 st.set_page_config(page_title="Dog and Cat Image Classifier", layout="centered")
 
-# Inject CSS for black background, white text, and bigger uploader styles
+# Inject CSS for black background, white text, and slightly bigger uploader styles
 st.markdown(
     """
     <style>
@@ -14,18 +14,19 @@ st.markdown(
         background-color: black;
         color: white;
     }
-    /* Bigger uploader label text */
+    /* Slightly bigger uploader label text, normal weight */
     .css-1d391kg p {
-        font-size: 20px !important;
-        font-weight: 600 !important;
-        margin-bottom: 10px !important;
+        font-size: 16px !important;
+        font-weight: normal !important;
+        margin-bottom: 8px !important;
+        color: white !important;
     }
-    /* Style the file input button */
+    /* Slightly larger file input button */
     input[type="file"] {
-        font-size: 18px !important;
-        padding: 12px !important;
+        font-size: 16px !important;
+        padding: 10px !important;
         cursor: pointer;
-        color: black !important; /* make file text visible */
+        color: black !important; /* ensure visible text */
     }
     </style>
     """,
@@ -49,17 +50,8 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
-# Bigger, centered uploader label
-st.markdown(
-    """
-    <div style="font-size: 24px; font-weight: bold; color: white; margin-bottom: 10px; text-align: center;">
-        Upload an image of a dog or cat
-    </div>
-    """,
-    unsafe_allow_html=True,
-)
-
-uploaded_file = st.file_uploader("", type=["jpg", "jpeg", "png"])
+# Just use the default uploader label (no extra markdown) for simplicity
+uploaded_file = st.file_uploader("Upload an image of a dog or cat", type=["jpg", "jpeg", "png"])
 
 if uploaded_file:
     image = Image.open(uploaded_file)
