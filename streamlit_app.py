@@ -6,7 +6,7 @@ from description_model import get_breed_description
 # Set page configuration
 st.set_page_config(page_title="Dog and Cat Image Classifier", layout="centered")
 
-# Display the centered logo, then centered small title, then horizontal line
+# Display the centered logo, then centered larger blue title, then horizontal line
 st.markdown(
     """
     <div style="text-align: center; margin-bottom: 5px;">
@@ -14,7 +14,7 @@ st.markdown(
         <div style="font-size: 10px; color: gray; margin-top: 4px;">
             LLM at Scale
         </div>
-        <div style="font-size: 14px; font-weight: 600; color: black; margin-top: 8px;">
+        <div style="font-size: 24px; font-weight: 700; color: #003366; margin-top: 8px;">
             Dog and Cat Image Classifier
         </div>
     </div>
