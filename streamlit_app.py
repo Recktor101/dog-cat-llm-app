@@ -19,13 +19,25 @@ def resize_with_aspect_ratio(image, max_size=300):
 # Set page config
 st.set_page_config(page_title="Dog and Cat Image Classifier", layout="centered")
 
-# Custom CSS for styling
+# Custom CSS for dark theme and styling
 st.markdown(
     """
     <style>
     .main {
         background-color: black;
         color: white;
+    }
+    .uploader-label {
+        font-size: 16px !important;
+        font-weight: normal !important;
+        margin-bottom: 8px !important;
+        color: white !important;
+    }
+    input[type="file"] {
+        font-size: 16px !important;
+        padding: 10px !important;
+        cursor: pointer;
+        color: black !important;
     }
     .status-text {
         text-align: center;
@@ -40,7 +52,7 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
-# Header with centered logo and white title text
+# Header with logo and title
 st.markdown(
     """
     <div style="text-align: center; margin-bottom: 5px;">
@@ -60,10 +72,11 @@ st.markdown(
 uploaded_file = st.file_uploader("Upload an image of a dog or cat", type=["jpg", "jpeg", "png"])
 
 if uploaded_file:
-    image = Image.open(uploaded_file)
+    # Open and resize image
+    image = Image.open(uploaded_file).convert("RGB")
     image = resize_with_aspect_ratio(image, max_size=300)
 
-    # Display image centered
+    # Display image
     buf = io.BytesIO()
     image.save(buf, format="PNG")
     img_bytes = buf.getvalue()
@@ -78,21 +91,17 @@ if uploaded_file:
         unsafe_allow_html=True,
     )
 
+    # Show status while classifying
     st.markdown('<div class="status-text">Classifying the image...</div>', unsafe_allow_html=True)
 
-    animal, breed_name, confidence = predict_image(image)
+    # Predict animal type, breed and confidence
+    label, breed_name, confidence = predict_image(image)
+    animal_label = label.capitalize()
 
-    # Make animal lowercase for display, e.g. "dog" or "cat"
-    animal_display = animal.lower() if animal else "unknown"
-
-    st.markdown(f"**Animal:** {animal_display}")
+    st.markdown(f"**Animal:** {animal_label}")
     st.markdown(f"**Breed:** {breed_name} ({confidence:.2%} confidence)")
 
-    if animal.lower() == "dog":
-        st.markdown('<div class="status-text">Generating breed description...</div>', unsafe_allow_html=True)
-        description = get_breed_description(animal, breed_name)
-        st.markdown(f"**Breed Description:**\n\n{description}")
-    elif animal.lower() == "cat":
-        st.markdown('<div class="status-text">Generating cat breed description (coming soon)...</div>', unsafe_allow_html=True)
-    else:
-        st.markdown('<div class="status-text">Breed description not available for unknown animals.</div>', unsafe_allow_html=True)
+    # Generate and show breed description
+    st.markdown('<div class="status-text">Generating breed description...</div>', unsafe_allow_html=True)
+    description = get_breed_description(label.lower(), breed_name)
+    st.markdown(f"**Breed Description:**\n\n{description}")
