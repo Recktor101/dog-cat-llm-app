@@ -1,4 +1,4 @@
-import streamlit as st
+port streamlit as st
 from PIL import Image
 from model import predict_image
 from description_model import get_breed_description
@@ -6,7 +6,7 @@ from description_model import get_breed_description
 # Set page configuration
 st.set_page_config(page_title="Dog and Cat Image Classifier", layout="centered")
 
-# Display the centered logo with centered, tiny text below and a horizontal line after
+# Display the centered logo, then centered small title, then horizontal line
 st.markdown(
     """
     <div style="text-align: center; margin-bottom: 5px;">
@@ -14,14 +14,14 @@ st.markdown(
         <div style="font-size: 10px; color: gray; margin-top: 4px;">
             LLM at Scale
         </div>
+        <div style="font-size: 14px; font-weight: 600; color: black; margin-top: 8px;">
+            Dog and Cat Image Classifier
+        </div>
     </div>
     <hr style="margin-top: 10px; margin-bottom: 20px;">
     """,
     unsafe_allow_html=True
 )
-
-# Smaller formal app title
-st.markdown("### Dog and Cat Image Classifier")
 
 # File uploader
 uploaded_file = st.file_uploader("Upload an image of a dog or cat", type=["jpg", "jpeg", "png"])
