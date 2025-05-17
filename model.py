@@ -12,6 +12,10 @@ model.eval()
 url = "https://raw.githubusercontent.com/pytorch/hub/master/imagenet_classes.txt"
 labels = urllib.request.urlopen(url).read().decode("utf-8").splitlines()
 
+cat_classes = {
+    "tabby", "tiger cat", "Persian cat", "Siamese cat", "Egyptian cat"
+}
+
 transform = transforms.Compose([
     transforms.Resize((224, 224)),
     transforms.ToTensor(),
@@ -26,7 +30,11 @@ def predict_image(image: Image.Image):
     confidence, predicted_idx = torch.max(probs, 0)
     predicted_label = labels[predicted_idx.item()]
 
-    if "dog" in predicted_label.lower():
+    label_lower = predicted_label.lower()
+
+    if any(cat in label_lower for cat in cat_classes):
+        return "CAT", predicted_label, confidence.item()
+    elif "dog" in label_lower:
         return "DOG", predicted_label, confidence.item()
     else:
-        return "CAT or UNKNOWN", predicted_label, confidence.item()
+        return "UNKNOWN", predicted_label, confidence.item()
