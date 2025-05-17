@@ -50,12 +50,11 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
-# Use default uploader label with CSS styling
 uploaded_file = st.file_uploader("Upload an image of a dog or cat", type=["jpg", "jpeg", "png"])
 
 if uploaded_file:
     image = Image.open(uploaded_file)
-    st.image(image, caption="Uploaded Image", width=200)  # Smaller image display
+    st.image(image, caption="Uploaded Image", width=300)  # Bigger image display (300px)
 
     st.markdown(
         """
