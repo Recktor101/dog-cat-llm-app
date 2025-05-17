@@ -5,10 +5,20 @@ from description_model import get_breed_description
 import io
 import base64
 
+# Resize helper to keep proportions
+def resize_with_aspect_ratio(image, max_size=300):
+    w, h = image.size
+    if w > h:
+        new_w = max_size
+        new_h = int(h * max_size / w)
+    else:
+        new_h = max_size
+        new_w = int(w * max_size / h)
+    return image.resize((new_w, new_h))
+
 # Set page config
 st.set_page_config(page_title="Dog and Cat Image Classifier", layout="centered")
 
-# Inject CSS for black background, white text, and styling for status messages
 st.markdown(
     """
     <style>
@@ -62,20 +72,17 @@ uploaded_file = st.file_uploader("Upload an image of a dog or cat", type=["jpg",
 
 if uploaded_file:
     image = Image.open(uploaded_file)
-    # Resize image to reduce memory usage
-    image = image.resize((300, 300))
+    image = resize_with_aspect_ratio(image, max_size=300)
 
-    # Convert image to base64 for embedding in HTML
     buf = io.BytesIO()
     image.save(buf, format="PNG")
     img_bytes = buf.getvalue()
     encoded_img = base64.b64encode(img_bytes).decode()
 
-    # Display image centered
     st.markdown(
         f"""
         <div style="text-align: center;">
-            <img src="data:image/png;base64,{encoded_img}" width="300" style="margin: auto;" />
+            <img src="data:image/png;base64,{encoded_img}" style="margin: auto;" />
             <div style="text-align: center; font-size: 12px; color: gray; margin-bottom: 15px;">
                 alien
             </div>
