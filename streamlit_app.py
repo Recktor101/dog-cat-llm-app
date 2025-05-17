@@ -84,5 +84,5 @@ if uploaded_file:
 
     # Description for both dogs and cats
     st.markdown('<div class="status-text">Generating breed description...</div>', unsafe_allow_html=True)
-    description = get_breed_description(breed)
+    description = get_breed_description(breed_name, animal_type=animal)
     st.markdown(f"**Breed Description:**\n\n{description}")
