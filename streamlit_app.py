@@ -6,7 +6,7 @@ from description_model import get_breed_description
 # Set page config
 st.set_page_config(page_title="Dog and Cat Image Classifier", layout="centered")
 
-# Inject CSS for black background and white text site-wide
+# Inject CSS for black background, white text, and bigger uploader styles
 st.markdown(
     """
     <style>
@@ -14,12 +14,25 @@ st.markdown(
         background-color: black;
         color: white;
     }
+    /* Bigger uploader label text */
+    .css-1d391kg p {
+        font-size: 20px !important;
+        font-weight: 600 !important;
+        margin-bottom: 10px !important;
+    }
+    /* Style the file input button */
+    input[type="file"] {
+        font-size: 18px !important;
+        padding: 12px !important;
+        cursor: pointer;
+        color: black !important; /* make file text visible */
+    }
     </style>
     """,
     unsafe_allow_html=True,
 )
 
-# Header with centered logo and white title text, no background color set explicitly
+# Header with centered logo and white title text
 st.markdown(
     """
     <div style="text-align: center; margin-bottom: 5px;">
@@ -33,10 +46,20 @@ st.markdown(
     </div>
     <hr style="margin-top: 10px; margin-bottom: 20px; border-color: white;">
     """,
-    unsafe_allow_html=True
+    unsafe_allow_html=True,
 )
 
-uploaded_file = st.file_uploader("Upload an image of a dog or cat", type=["jpg", "jpeg", "png"])
+# Bigger, centered uploader label
+st.markdown(
+    """
+    <div style="font-size: 24px; font-weight: bold; color: white; margin-bottom: 10px; text-align: center;">
+        Upload an image of a dog or cat
+    </div>
+    """,
+    unsafe_allow_html=True,
+)
+
+uploaded_file = st.file_uploader("", type=["jpg", "jpeg", "png"])
 
 if uploaded_file:
     image = Image.open(uploaded_file)
