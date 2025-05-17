@@ -6,12 +6,16 @@ from description_model import get_breed_description
 # Set page configuration
 st.set_page_config(page_title="Dog and Cat Image Classifier", layout="centered")
 
-# Display the centered logo
+# Display the centered logo with centered, tiny text below and a horizontal line after
 st.markdown(
     """
-    <div style="text-align: center; margin-bottom: 20px;">
+    <div style="text-align: center; margin-bottom: 5px;">
         <img src="https://raw.githubusercontent.com/Recktor101/dog-cat-llm-app/main/assets/llmatscale-logo.png" width="250">
+        <div style="font-size: 10px; color: gray; margin-top: 4px;">
+            LLM at Scale
+        </div>
     </div>
+    <hr style="margin-top: 10px; margin-bottom: 20px;">
     """,
     unsafe_allow_html=True
 )
