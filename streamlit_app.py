@@ -40,11 +40,11 @@ st.markdown(
     }
     .status-text {
         text-align: center;
-        font-weight: 700;
-        color: #e0e0e0;
-        text-shadow: 1px 1px 3px rgba(0,0,0,0.8);
+        font-weight: normal;
+        color: #555555;  /* Dark gray */
         margin-bottom: 15px;
-        font-size: 18px;
+        font-size: 14px; /* Smaller font size */
+        font-style: italic;  /* Optional: italic for subtle effect */
     }
     </style>
     """,
