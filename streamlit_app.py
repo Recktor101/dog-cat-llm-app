@@ -5,15 +5,18 @@ from description_model import get_breed_description
 
 st.set_page_config(page_title="Dog and Cat Image Classifier", layout="centered")
 
-# CSS to shrink the drag and drop area/button and make line white
+# CSS to shrink the drag and drop area/button, make line white, adjust spacing and size
 st.markdown(
     """
     <style>
-    /* Shrink the file uploader label/button */
+    /* Shrink and widen the file uploader label/button */
     div[data-testid="fileUploaderDropzone"] > label {
-        padding: 0.2rem 0.6rem !important;
-        font-size: 12px !important;
-        max-width: 150px;
+        padding: 0.3rem 1rem !important;  /* more horizontal padding for width */
+        font-size: 14px !important;       /* slightly bigger text */
+        max-width: 180px;                 /* wider to fit label */
+        white-space: nowrap;              /* keep label on one line */
+        margin-left: 8px !important;     /* closer to the left text */
+        cursor: pointer;
     }
     /* Make horizontal line white */
     hr {
@@ -24,7 +27,7 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
-# Header with logo and title (title stays dark blue as before)
+# Header with logo and title (title stays dark blue)
 st.markdown(
     """
     <div style="text-align: center; margin-bottom: 5px;">
@@ -41,14 +44,14 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
-# Create two columns: label left, uploader right
-col1, col2 = st.columns([3,1])
+# Create two columns: label left, uploader right, reduce gap
+col1, col2 = st.columns([4,1])
 
 with col1:
     st.markdown(
         """
         <div style="display: flex; align-items: center; height: 100%;">
-            <span style="font-size: 16px; font-weight: 500; color: white;">
+            <span style="font-size: 18px; font-weight: 500; color: white;">
                 Upload an image of a dog or cat
             </span>
         </div>
