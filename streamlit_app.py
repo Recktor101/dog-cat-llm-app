@@ -3,13 +3,26 @@ from PIL import Image
 from model import predict_image
 from description_model import get_breed_description
 
-# Set page configuration
+# Set page config
 st.set_page_config(page_title="Dog and Cat Image Classifier", layout="centered")
 
-# Dark background behind logo and title with white text title
+# Inject CSS for black background and white text site-wide
 st.markdown(
     """
-    <div style="text-align: center; margin-bottom: 5px; background-color: #003366; padding: 15px; border-radius: 8px;">
+    <style>
+    .main {
+        background-color: black;
+        color: white;
+    }
+    </style>
+    """,
+    unsafe_allow_html=True,
+)
+
+# Header with centered logo and white title text, no background color set explicitly
+st.markdown(
+    """
+    <div style="text-align: center; margin-bottom: 5px;">
         <img src="https://raw.githubusercontent.com/Recktor101/dog-cat-llm-app/main/assets/llmatscale-logo.png" width="250">
         <div style="font-size: 10px; color: lightgray; margin-top: 4px;">
             LLM at Scale
@@ -18,26 +31,24 @@ st.markdown(
             Dog and Cat Image Classifier
         </div>
     </div>
-    <hr style="margin-top: 10px; margin-bottom: 20px;">
+    <hr style="margin-top: 10px; margin-bottom: 20px; border-color: white;">
     """,
     unsafe_allow_html=True
 )
 
-# File uploader
 uploaded_file = st.file_uploader("Upload an image of a dog or cat", type=["jpg", "jpeg", "png"])
 
 if uploaded_file:
     image = Image.open(uploaded_file)
     st.image(image, caption="Uploaded Image", use_column_width=True)
 
-    # Add 'alien' text centered below image in smaller font
     st.markdown(
         """
         <div style="text-align: center; font-size: 12px; color: gray; margin-bottom: 15px;">
             alien
         </div>
         """,
-        unsafe_allow_html=True
+        unsafe_allow_html=True,
     )
 
     if st.button("Predict"):
