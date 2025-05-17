@@ -74,33 +74,38 @@ if uploaded_file:
     image = Image.open(uploaded_file)
     image = resize_with_aspect_ratio(image, max_size=300)
 
+    # Encode image to display
     buf = io.BytesIO()
     image.save(buf, format="PNG")
     img_bytes = buf.getvalue()
     encoded_img = base64.b64encode(img_bytes).decode()
 
+    # Display uploaded image centered
     st.markdown(
         f"""
         <div style="text-align: center;">
-            <img src="data:image/png;base64,{encoded_img}" style="margin: auto;" />
-            <div style="text-align: center; font-size: 12px; color: gray; margin-bottom: 15px;">
-                alien
-            </div>
+            <img src="data:image/png;base64,{encoded_img}" style="margin: auto; max-width: 300px; height: auto;" />
         </div>
         """,
         unsafe_allow_html=True,
     )
 
+    # Show classifying status in smaller gray italic text
     st.markdown('<div class="status-text">Classifying the image...</div>', unsafe_allow_html=True)
 
     label, breed, confidence = predict_image(image)
 
-    animal_label = label.capitalize()  # "Dog" or "Cat"
+    animal_label = label.capitalize()
 
     st.markdown(f"**Animal:** {animal_label}")
     st.markdown(f"**Breed:** {breed} ({confidence:.2%} confidence)")
 
-    if label == "DOG":
+    if label == "dog":
         st.markdown('<div class="status-text">Generating breed description...</div>', unsafe_allow_html=True)
         description = get_breed_description(breed)
         st.markdown(f"**Breed Description:**\n\n{description}")
+    elif label == "cat":
+        st.markdown('<div class="status-text">Generating cat breed description (coming soon)...</div>', unsafe_allow_html=True)
+        st.markdown("Cat breed description support is on the way!")
+    else:
+        st.markdown("Sorry, the uploaded image doesn't seem to be a dog or cat.")
