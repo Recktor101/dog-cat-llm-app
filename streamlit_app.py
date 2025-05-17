@@ -5,34 +5,46 @@ from description_model import get_breed_description
 
 st.set_page_config(page_title="Dog and Cat Image Classifier", layout="centered")
 
-# CSS styles
+# CSS to style uploader and layout
 st.markdown(
     """
     <style>
-    /* Make the file uploader smaller in width and taller in height, vertical text label */
+    /* Style the file uploader button */
     div[data-testid="fileUploaderDropzone"] > label {
-        width: 90px !important;
-        height: 70px !important;
-        padding: 0.4rem !important;
+        max-width: 180px !important;  /* wider button */
         font-size: 14px !important;
-        writing-mode: vertical-rl;
-        text-orientation: mixed;
-        display: flex !important;
-        justify-content: center;
-        align-items: center;
+        padding: 0.4rem 1rem !important;
         white-space: nowrap;
         cursor: pointer;
-        background-color: #f0f0f0;
         border-radius: 8px;
-        border: 1px solid #ddd;
-        color: #444;
-        user-select: none;
-        margin-left: 8px !important;
+        border: 1px solid #555;
+        background-color: #222;
+        color: white;
+        margin-left: 10px !important; /* small gap to the left text */
+        display: inline-block;
     }
 
-    /* Hide the default file input text to just show custom label */
-    input[type="file"] {
-        display: none !important;
+    /* Keep uploader height default */
+    div[data-testid="fileUploaderDropzone"] {
+        height: auto !important;
+        display: inline-block;
+    }
+
+    /* Container to align label and uploader horizontally and center vertically */
+    .upload-container {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px; /* small gap between label and uploader */
+        margin-bottom: 20px;
+    }
+
+    /* Style for upload label */
+    .upload-label {
+        font-size: 18px;
+        font-weight: 500;
+        color: white;
+        white-space: nowrap;
     }
 
     /* White horizontal line */
@@ -61,22 +73,23 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
-# Two columns: label text left, vertical drag-and-drop file uploader right
-col1, col2 = st.columns([4,1])
+# Custom upload container
+st.markdown(
+    """
+    <div class="upload-container">
+        <div class="upload-label">Upload an image of a dog or cat</div>
+    </div>
+    """,
+    unsafe_allow_html=True,
+)
 
-with col1:
-    st.markdown(
-        """
-        <div style="display: flex; align-items: center; height: 70px;">
-            <span style="font-size: 18px; font-weight: 500; color: white;">
-                Upload an image of a dog or cat
-            </span>
-        </div>
-        """,
-        unsafe_allow_html=True,
-    )
+# Create a container to hold the uploader and align with label
+cols = st.columns([4, 1])
 
-with col2:
+with cols[0]:
+    st.write("")  # Empty to align uploader right
+
+with cols[1]:
     uploaded_file = st.file_uploader("", type=["jpg", "jpeg", "png"], key="uploader")
 
 if uploaded_file:
