@@ -28,6 +28,12 @@ st.markdown(
         cursor: pointer;
         color: black !important; /* ensure visible text */
     }
+    /* Center the uploaded image */
+    .uploaded-image {
+        display: block;
+        margin-left: auto;
+        margin-right: auto;
+    }
     </style>
     """,
     unsafe_allow_html=True,
@@ -54,7 +60,7 @@ uploaded_file = st.file_uploader("Upload an image of a dog or cat", type=["jpg",
 
 if uploaded_file:
     image = Image.open(uploaded_file)
-    st.image(image, caption="Uploaded Image", width=300)  # Bigger image display (300px)
+    st.image(image, caption="Uploaded Image", width=300, use_column_width=False, clamp=True, output_format="auto", classes="uploaded-image")
 
     st.markdown(
         """
@@ -65,15 +71,14 @@ if uploaded_file:
         unsafe_allow_html=True,
     )
 
-    if st.button("Predict"):
-        st.write("Classifying the image...")
-        label, breed, confidence = predict_image(image)
+    st.write("Classifying the image...")
 
-        st.markdown(f"**Prediction:** {label}")
-        st.markdown(f"**Breed:** {breed}")
-        st.markdown(f"**Confidence:** {confidence:.2%}")
+    label, breed, confidence = predict_image(image)
 
-        if label == "DOG":
-            st.write("Generating breed description...")
-            description = get_breed_description(breed)
-            st.markdown(f"**Breed Description:**\n\n{description}")
+    st.markdown(f"**Animal:** {label}")
+    st.markdown(f"**Breed:** {breed} ({confidence:.2%} confidence)")
+
+    if label == "DOG":
+        st.write("Generating breed description...")
+        description = get_breed_description(breed)
+        st.markdown(f"**Breed Description:**\n\n{description}")
