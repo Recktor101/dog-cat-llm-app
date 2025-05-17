@@ -62,6 +62,8 @@ uploaded_file = st.file_uploader("Upload an image of a dog or cat", type=["jpg",
 
 if uploaded_file:
     image = Image.open(uploaded_file)
+    # Resize image to reduce memory usage
+    image = image.resize((300, 300))
 
     # Convert image to base64 for embedding in HTML
     buf = io.BytesIO()
@@ -86,8 +88,7 @@ if uploaded_file:
 
     label, breed, confidence = predict_image(image)
 
-    # Capitalize label normally, not uppercase
-    animal_label = label.capitalize()
+    animal_label = label.capitalize()  # "Dog" or "Cat"
 
     st.markdown(f"**Animal:** {animal_label}")
     st.markdown(f"**Breed:** {breed} ({confidence:.2%} confidence)")
