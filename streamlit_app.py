@@ -2,11 +2,12 @@ import streamlit as st
 from PIL import Image
 from model import predict_image
 from description_model import get_breed_description
+import io
 
 # Set page config
 st.set_page_config(page_title="Dog and Cat Image Classifier", layout="centered")
 
-# Inject CSS for black background, white text, and slightly bigger uploader styles
+# Inject CSS for black background and white text
 st.markdown(
     """
     <style>
@@ -14,25 +15,17 @@ st.markdown(
         background-color: black;
         color: white;
     }
-    /* Slightly bigger uploader label text, normal weight */
-    .css-1d391kg p {
+    .uploader-label {
         font-size: 16px !important;
         font-weight: normal !important;
         margin-bottom: 8px !important;
         color: white !important;
     }
-    /* Slightly larger file input button */
     input[type="file"] {
         font-size: 16px !important;
         padding: 10px !important;
         cursor: pointer;
-        color: black !important; /* ensure visible text */
-    }
-    /* Center the uploaded image */
-    .uploaded-image {
-        display: block;
-        margin-left: auto;
-        margin-right: auto;
+        color: black !important;
     }
     </style>
     """,
@@ -60,12 +53,25 @@ uploaded_file = st.file_uploader("Upload an image of a dog or cat", type=["jpg",
 
 if uploaded_file:
     image = Image.open(uploaded_file)
-    st.image(image, caption="Uploaded Image", width=300, use_column_width=False, clamp=True, output_format="auto", classes="uploaded-image")
+
+    # Convert image to bytes for HTML display
+    buf = io.BytesIO()
+    image.save(buf, format="PNG")
+    byte_im = buf.getvalue()
+    encoded = byte_im.hex()
+
+    # Display image centered with HTML + base64 encoding
+    import base64
+    img_bytes = buf.getvalue()
+    encoded_img = base64.b64encode(img_bytes).decode()
 
     st.markdown(
-        """
-        <div style="text-align: center; font-size: 12px; color: gray; margin-bottom: 15px;">
-            alien
+        f"""
+        <div style="text-align: center;">
+            <img src="data:image/png;base64,{encoded_img}" width="300" style="margin: auto;" />
+            <div style="text-align: center; font-size: 12px; color: gray; margin-bottom: 15px;">
+                alien
+            </div>
         </div>
         """,
         unsafe_allow_html=True,
