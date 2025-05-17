@@ -5,21 +5,26 @@ from description_model import get_breed_description
 
 st.set_page_config(page_title="Dog and Cat Image Classifier", layout="centered")
 
-# CSS for making the file uploader button smaller
+# CSS to shrink the drag and drop area/button and make line white
 st.markdown(
     """
     <style>
-    /* Shrink the file uploader button */
+    /* Shrink the file uploader label/button */
     div[data-testid="fileUploaderDropzone"] > label {
-        padding: 0.2rem 0.5rem !important;
+        padding: 0.2rem 0.6rem !important;
         font-size: 12px !important;
+        max-width: 150px;
+    }
+    /* Make horizontal line white */
+    hr {
+        border-color: white !important;
     }
     </style>
     """,
     unsafe_allow_html=True,
 )
 
-# Header with logo and title
+# Header with logo and title (title stays dark blue as before)
 st.markdown(
     """
     <div style="text-align: center; margin-bottom: 5px;">
@@ -31,31 +36,28 @@ st.markdown(
             Dog and Cat Image Classifier
         </div>
     </div>
-    <hr style="margin-top: 10px; margin-bottom: 20px; border-color: #003366;">
+    <hr style="margin-top: 10px; margin-bottom: 20px;">
     """,
     unsafe_allow_html=True,
 )
 
-# Create two columns with some width ratio for uploader button and label
-col1, col2, col3 = st.columns([1, 0.1, 3])
+# Create two columns: label left, uploader right
+col1, col2 = st.columns([3,1])
 
 with col1:
-    uploaded_file = st.file_uploader("", type=["jpg", "jpeg", "png"], key="uploader")
-
-with col2:
-    st.write("")  # small gap column
-
-with col3:
     st.markdown(
         """
         <div style="display: flex; align-items: center; height: 100%;">
-            <span style="font-size: 16px; font-weight: 500; color: #003366;">
+            <span style="font-size: 16px; font-weight: 500; color: white;">
                 Upload an image of a dog or cat
             </span>
         </div>
         """,
         unsafe_allow_html=True,
     )
+
+with col2:
+    uploaded_file = st.file_uploader("", type=["jpg", "jpeg", "png"], key="uploader")
 
 if uploaded_file:
     image = Image.open(uploaded_file)
