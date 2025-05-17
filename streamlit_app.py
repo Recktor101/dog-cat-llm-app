@@ -3,11 +3,12 @@ from PIL import Image
 from model import predict_image
 from description_model import get_breed_description
 import io
+import base64
 
 # Set page config
 st.set_page_config(page_title="Dog and Cat Image Classifier", layout="centered")
 
-# Inject CSS for black background and white text
+# Inject CSS for black background, white text, and styling for status messages
 st.markdown(
     """
     <style>
@@ -26,6 +27,14 @@ st.markdown(
         padding: 10px !important;
         cursor: pointer;
         color: black !important;
+    }
+    .status-text {
+        text-align: center;
+        font-weight: 700;
+        color: #e0e0e0;
+        text-shadow: 1px 1px 3px rgba(0,0,0,0.8);
+        margin-bottom: 15px;
+        font-size: 18px;
     }
     </style>
     """,
@@ -54,17 +63,13 @@ uploaded_file = st.file_uploader("Upload an image of a dog or cat", type=["jpg",
 if uploaded_file:
     image = Image.open(uploaded_file)
 
-    # Convert image to bytes for HTML display
+    # Convert image to base64 for embedding in HTML
     buf = io.BytesIO()
     image.save(buf, format="PNG")
-    byte_im = buf.getvalue()
-    encoded = byte_im.hex()
-
-    # Display image centered with HTML + base64 encoding
-    import base64
     img_bytes = buf.getvalue()
     encoded_img = base64.b64encode(img_bytes).decode()
 
+    # Display image centered
     st.markdown(
         f"""
         <div style="text-align: center;">
@@ -77,14 +82,17 @@ if uploaded_file:
         unsafe_allow_html=True,
     )
 
-    st.write("Classifying the image...")
+    st.markdown('<div class="status-text">Classifying the image...</div>', unsafe_allow_html=True)
 
     label, breed, confidence = predict_image(image)
 
-    st.markdown(f"**Animal:** {label}")
+    # Capitalize label normally, not uppercase
+    animal_label = label.capitalize()
+
+    st.markdown(f"**Animal:** {animal_label}")
     st.markdown(f"**Breed:** {breed} ({confidence:.2%} confidence)")
 
     if label == "DOG":
-        st.write("Generating breed description...")
+        st.markdown('<div class="status-text">Generating breed description...</div>', unsafe_allow_html=True)
         description = get_breed_description(breed)
         st.markdown(f"**Breed Description:**\n\n{description}")
