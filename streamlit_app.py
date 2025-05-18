@@ -23,22 +23,42 @@ st.set_page_config(page_title="Dog and Cat Image Classifier", layout="centered")
 st.markdown(
     """
     <style>
-    /* Custom uploader style: black background, white text & icons */
+    /* Hide default file input but keep it clickable */
+    div[data-testid="stFileUploader"] input[type="file"] {
+        opacity: 0;
+        width: 100%;
+        height: 100%;
+        position: absolute;
+        cursor: pointer;
+        z-index: 10;
+    }
+
+    /* Style uploader container as big black dashed button */
     div[data-testid="stFileUploader"] > div:first-child {
         background-color: black !important;
         color: white !important;
         border: 2px dashed white !important;
         border-radius: 10px;
-        padding: 20px;
+        padding: 30px 20px;
+        text-align: center;
+        font-size: 18px;
+        font-weight: 700;
+        cursor: pointer;
+        position: relative;
+        overflow: hidden;
+        user-select: none;
     }
 
+    /* Color SVG icons white */
     div[data-testid="stFileUploader"] svg {
         color: white !important;
         fill: white !important;
     }
 
+    /* Label text white, pointer events none to allow click on input */
     div[data-testid="stFileUploader"] label {
         color: white !important;
+        pointer-events: none;
     }
 
     /* Status text */
@@ -51,7 +71,7 @@ st.markdown(
         font-style: italic;
     }
 
-    /* Make all text darker and bolder */
+    /* All text pure black and bold */
     body, 
     .css-18e3th9,
     .css-1d391kg,
@@ -59,13 +79,13 @@ st.markdown(
     div,
     p,
     span {
-        color: #000000 !important;  /* pure black */
+        color: #000000 !important;
         font-weight: 600 !important;
     }
 
     /* Response text styling */
     .response-text {
-        color: #000000; /* pure black */
+        color: #000000;
         font-weight: 600;
         margin-top: 10px;
         margin-bottom: 10px;
