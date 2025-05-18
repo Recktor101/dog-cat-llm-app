@@ -35,7 +35,8 @@ st.markdown(
     .main > div:first-child {
         padding-top: 20px;
     }
-    /* Custom uploader label */
+
+    /* Label above uploader */
     .custom-upload-label {
         font-size: 13px;
         color: black;
@@ -43,11 +44,27 @@ st.markdown(
         margin-bottom: 6px;
         text-align: center;
     }
-    /* Optional: style the uploader */
+
+    /* Full black drag and drop uploader */
     div[data-testid="stFileUploader"] > div:first-child {
-        border: 2px dashed #ccc !important;
+        background-color: black !important;
+        color: white !important;
+        border: 2px dashed white !important;
         border-radius: 10px;
         padding: 20px;
+        cursor: pointer;
+        text-align: center;
+    }
+    div[data-testid="stFileUploader"] > div:first-child:hover {
+        background-color: #222222 !important;
+    }
+    div[data-testid="stFileUploader"] svg {
+        color: white !important;
+        fill: white !important;
+    }
+    div[data-testid="stFileUploader"] label {
+        color: white !important;
+        font-weight: 600;
     }
     </style>
     <div class="top-black-bar"></div>
@@ -72,13 +89,13 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
-# --- Custom label above uploader ---
+# --- Label above uploader ---
 st.markdown('<div class="custom-upload-label">Upload an image of a Dog or Cat</div>', unsafe_allow_html=True)
 
 # --- File uploader ---
 uploaded_file = st.file_uploader("", type=["jpg", "jpeg", "png"])
 
-# --- Image processing ---
+# --- Process uploaded image ---
 if uploaded_file:
     image = Image.open(uploaded_file).convert("RGB")
     image = resize_with_aspect_ratio(image, max_size=300)
