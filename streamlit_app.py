@@ -35,23 +35,26 @@ st.markdown(
         box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
     }
 
-    /* Style uploader */
-    section[data-testid="stFileUploader"] > div {
-        background-color: #000000;
-        color: white;
-        border-radius: 8px;
-        padding: 12px;
-    }
-
-    section[data-testid="stFileUploader"] label {
+    /* Make uploader drop area black */
+    div[data-testid="stFileUploader"] > div:first-child {
+        background-color: black !important;
         color: white !important;
+        border: 2px dashed white !important;
+        border-radius: 10px;
+        padding: 20px;
     }
 
-    section[data-testid="stFileUploader"] svg {
+    /* Force white icon and label inside uploader */
+    div[data-testid="stFileUploader"] svg {
+        color: white !important;
         fill: white !important;
     }
 
-    /* Status text style */
+    div[data-testid="stFileUploader"] label {
+        color: white !important;
+    }
+
+    /* Status text */
     .status-text {
         text-align: center;
         font-weight: normal;
@@ -62,6 +65,12 @@ st.markdown(
     }
     </style>
 
+    <div class="top-bar">
+        LLM at Scale — Dog & Cat Classifier App
+    </div>
+    """,
+    unsafe_allow_html=True,
+)
     <div class="top-bar">
         LLM at Scale — Dog & Cat Classifier App
     </div>
