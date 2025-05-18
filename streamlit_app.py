@@ -20,12 +20,12 @@ st.set_page_config(page_title="Dog and Cat Image Classifier", layout="centered")
 st.markdown(
     """
     <style>
-    /* Container around uploader */
+    /* Entire uploader container */
     div[data-testid="stFileUploader"] > div:first-child {
         background-color: black !important;
         border: 2px dashed white !important;
         border-radius: 10px;
-        padding: 30px 20px;
+        padding: 40px 20px;
         text-align: center;
         font-size: 18px;
         font-weight: 700;
@@ -35,7 +35,15 @@ st.markdown(
         user-select: none;
     }
 
-    /* Force the button inside uploader black */
+    /* Text inside uploader including placeholder text */
+    div[data-testid="stFileUploader"] label,
+    div[data-testid="stFileUploader"] span {
+        color: white !important;
+        font-weight: 700 !important;
+        pointer-events: none;
+    }
+
+    /* The browse files button */
     div[data-testid="stFileUploader"] button {
         background-color: black !important;
         color: white !important;
@@ -44,13 +52,14 @@ st.markdown(
         font-weight: 700 !important;
         border-radius: 8px !important;
         cursor: pointer !important;
+        margin-top: 12px;
     }
     div[data-testid="stFileUploader"] button:hover {
         background-color: #222 !important;
         border-color: #ddd !important;
     }
 
-    /* File input */
+    /* The file input itself is invisible but clickable */
     div[data-testid="stFileUploader"] input[type="file"] {
         opacity: 0;
         width: 100%;
@@ -61,20 +70,13 @@ st.markdown(
         z-index: 10;
     }
 
-    /* Label text */
-    div[data-testid="stFileUploader"] label {
-        color: white !important;
-        font-weight: 700 !important;
-        pointer-events: none;
-    }
-
-    /* Icons in uploader */
+    /* Icons inside uploader */
     div[data-testid="stFileUploader"] svg {
         fill: white !important;
         color: white !important;
     }
 
-    /* All app text black & bold */
+    /* Make all text in app black and bold */
     body, 
     .css-18e3th9,
     .css-1d391kg,
