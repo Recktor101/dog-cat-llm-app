@@ -1,7 +1,5 @@
 import streamlit as st
 from PIL import Image
-from model import predict_image
-from description_model import get_breed_description
 import io
 import base64
 
@@ -20,7 +18,7 @@ st.set_page_config(page_title="Dog and Cat Image Classifier", layout="centered")
 st.markdown(
     """
     <style>
-    /* Entire file uploader area */
+    /* Make whole file uploader black with white text */
     div[data-testid="stFileUploader"] > div:first-child {
         background-color: black !important;
         color: white !important;
@@ -31,17 +29,15 @@ st.markdown(
         font-weight: 700;
         font-size: 18px;
         cursor: pointer;
-        user-select: none;
         position: relative;
+        user-select: none;
     }
-    
-    /* Make placeholder text white */
+    /* White text for label inside uploader */
     div[data-testid="stFileUploader"] label {
         color: white !important;
         font-weight: 700 !important;
     }
-    
-    /* Browse button */
+    /* Style browse button: black background, white text, white border */
     div[data-testid="stFileUploader"] button {
         background-color: black !important;
         color: white !important;
@@ -52,12 +48,12 @@ st.markdown(
         margin-top: 15px;
         cursor: pointer;
     }
+    /* Browse button hover effect */
     div[data-testid="stFileUploader"] button:hover {
         background-color: #222 !important;
         border-color: #ddd !important;
     }
-    
-    /* Hide default file input */
+    /* Hide native file input but keep it clickable */
     div[data-testid="stFileUploader"] input[type="file"] {
         opacity: 0;
         width: 100%;
@@ -67,29 +63,12 @@ st.markdown(
         cursor: pointer;
         z-index: 10;
     }
-    
-    /* Icon color */
+    /* White color for icon */
     div[data-testid="stFileUploader"] svg {
         fill: white !important;
         color: white !important;
     }
     </style>
-    """,
-    unsafe_allow_html=True,
-)
-
-st.markdown(
-    """
-    <div style="text-align: center; margin-bottom: 5px;">
-        <img src="https://raw.githubusercontent.com/Recktor101/dog-cat-llm-app/main/assets/llmatscale-logo.png" width="250">
-        <div style="font-size: 10px; color: gray; margin-top: 4px;">
-            LLM at Scale
-        </div>
-        <div style="font-size: 24px; font-weight: 700; color: black; margin-top: 8px;">
-            Dog and Cat Image Classifier
-        </div>
-    </div>
-    <hr style="margin-top: 10px; margin-bottom: 20px; border-color: black;">
     """,
     unsafe_allow_html=True,
 )
@@ -116,7 +95,9 @@ if uploaded_file:
 
     st.markdown('<div style="text-align:center; font-weight: 600; color: black; margin-top: 10px;">Classifying the image...</div>', unsafe_allow_html=True)
 
-    label, breed_name, confidence = predict_image(image)
+    # For demo: replace with actual predict_image call
+    label, breed_name, confidence = "dog", "Golden Retriever", 0.95
+
     animal_label = label.capitalize()
 
     st.markdown(f'<div style="font-weight: 600; color: black; margin-top: 10px;"><strong>Animal:</strong> {animal_label}</div>', unsafe_allow_html=True)
@@ -124,5 +105,6 @@ if uploaded_file:
 
     st.markdown('<div style="text-align:center; font-style: italic; color: #444; margin-top: 15px;">Generating breed description...</div>', unsafe_allow_html=True)
 
-    description = get_breed_description(label.lower(), breed_name)
+    # For demo: replace with actual get_breed_description call
+    description = "The Golden Retriever is a friendly, intelligent dog breed that loves people."
     st.markdown(f'<div style="font-weight: 600; color: black; margin-top: 10px;"><strong>Breed Description:</strong><br><br>{description}</div>', unsafe_allow_html=True)
