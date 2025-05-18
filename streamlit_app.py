@@ -5,7 +5,6 @@ from description_model import get_breed_description
 import io
 import base64
 
-# Resize image while maintaining aspect ratio
 def resize_with_aspect_ratio(image, max_size=300):
     w, h = image.size
     if w > h:
@@ -16,34 +15,55 @@ def resize_with_aspect_ratio(image, max_size=300):
         new_w = int(w * max_size / h)
     return image.resize((new_w, new_h))
 
-# Set page config
 st.set_page_config(page_title="Dog and Cat Image Classifier", layout="centered")
 
-# --- Styling ONLY for drag and drop uploader: black background + white text ---
 st.markdown(
     """
     <style>
-    /* Remove any black top bar - no top bar CSS here */
+    /* Remove top black bar entirely (no styles for it) */
 
-    /* Drag and drop uploader area */
+    /* Hide the actual file input button */
+    div[data-testid="stFileUploader"] input[type="file"] {
+        opacity: 0;
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        cursor: pointer;
+        z-index: 2;
+    }
+
+    /* Style the uploader container */
     div[data-testid="stFileUploader"] > div:first-child {
         background-color: black !important;
         color: white !important;
         border: 2px dashed white !important;
         border-radius: 10px;
         padding: 20px;
+        position: relative;
+        text-align: center;
+        font-weight: 600;
         cursor: pointer;
+        font-size: 16px;
+        user-select: none;
     }
-    div[data-testid="stFileUploader"] > div:first-child:hover {
-        background-color: #222222 !important;
+
+    /* Style the label that contains the "browse files" text */
+    div[data-testid="stFileUploader"] label {
+        color: white !important;
+        cursor: pointer;
+        font-weight: 600;
     }
+
+    /* Style SVG icon inside uploader */
     div[data-testid="stFileUploader"] svg {
         color: white !important;
         fill: white !important;
+        vertical-align: middle;
     }
-    div[data-testid="stFileUploader"] label {
-        color: white !important;
-        font-weight: 600;
+
+    /* Hover effect for uploader */
+    div[data-testid="stFileUploader"] > div:first-child:hover {
+        background-color: #222222 !important;
     }
 
     /* Status text */
@@ -60,7 +80,7 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
-# --- Logo and app title (NO black top bar here) ---
+# Logo and title (no black top bar)
 st.markdown(
     """
     <div style="text-align: center; margin-bottom: 5px;">
@@ -77,15 +97,12 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
-# --- File uploader ---
 uploaded_file = st.file_uploader("Upload an image of a dog or cat", type=["jpg", "jpeg", "png"])
 
-# --- Process uploaded image ---
 if uploaded_file:
     image = Image.open(uploaded_file).convert("RGB")
     image = resize_with_aspect_ratio(image, max_size=300)
 
-    # Convert to base64 for display
     buf = io.BytesIO()
     image.save(buf, format="PNG")
     img_bytes = buf.getvalue()
