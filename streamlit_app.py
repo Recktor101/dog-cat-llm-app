@@ -16,67 +16,38 @@ def resize_with_aspect_ratio(image, max_size=300):
         new_w = int(w * max_size / h)
     return image.resize((new_w, new_h))
 
-# Set page config
+# Page setup
 st.set_page_config(page_title="Dog and Cat Image Classifier", layout="centered")
 
-# --- Full width black bar at top, with white background below ---
+# --- Top black bar ---
 st.markdown(
     """
     <style>
-    /* Black bar fixed at the very top */
     .top-black-bar {
         position: fixed;
         top: 0;
         left: 0;
         width: 100vw;
-        height: 20px;  /* adjust thickness here */
+        height: 20px;
         background-color: black;
         z-index: 9999;
     }
-    /* Push page content down so it doesn't get hidden behind the bar */
     .main > div:first-child {
         padding-top: 20px;
     }
-
-    /* Tiny label above uploader */
-    .upload-label {
-        font-size: 11px;
-        color: #666666;
-        font-style: italic;
-        text-align: center;
-        margin-bottom: 4px;
+    /* Custom uploader label */
+    .custom-upload-label {
+        font-size: 13px;
+        color: black;
         font-weight: 500;
+        margin-bottom: 6px;
+        text-align: center;
     }
-    
-    /* Drag and drop uploader area */
+    /* Optional: style the uploader */
     div[data-testid="stFileUploader"] > div:first-child {
-        background-color: black !important;
-        color: white !important;
-        border: 2px dashed white !important;
+        border: 2px dashed #ccc !important;
         border-radius: 10px;
         padding: 20px;
-        cursor: pointer;
-    }
-    div[data-testid="stFileUploader"] > div:first-child:hover {
-        background-color: #222222 !important;
-    }
-    div[data-testid="stFileUploader"] svg {
-        color: white !important;
-        fill: white !important;
-    }
-    div[data-testid="stFileUploader"] label {
-        color: white !important;
-        font-weight: 600;
-    }
-
-    /* Status text */
-    .status-text {
-        text-align: center;
-        font-weight: normal;
-        color: #444444;
-        margin-bottom: 15px;
-        font-size: 14px;
-        font-style: italic;
     }
     </style>
     <div class="top-black-bar"></div>
@@ -101,22 +72,20 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
-# --- Tiny label above uploader ---
-st.markdown('<div class="upload-label">Upload dog or cat photo</div>', unsafe_allow_html=True)
+# --- Custom label above uploader ---
+st.markdown('<div class="custom-upload-label">Upload an image of a Dog or Cat</div>', unsafe_allow_html=True)
 
 # --- File uploader ---
-uploaded_file = st.file_uploader("", type=["jpg", "jpeg", "png"])  # empty label since we added custom above
+uploaded_file = st.file_uploader("", type=["jpg", "jpeg", "png"])
 
-# --- Process uploaded image ---
+# --- Image processing ---
 if uploaded_file:
     image = Image.open(uploaded_file).convert("RGB")
     image = resize_with_aspect_ratio(image, max_size=300)
 
-    # Convert to base64 for display
     buf = io.BytesIO()
     image.save(buf, format="PNG")
-    img_bytes = buf.getvalue()
-    encoded_img = base64.b64encode(img_bytes).decode()
+    encoded_img = base64.b64encode(buf.getvalue()).decode()
 
     st.markdown(
         f"""
@@ -127,15 +96,13 @@ if uploaded_file:
         unsafe_allow_html=True,
     )
 
-    st.markdown('<div class="status-text">Classifying the image...</div>', unsafe_allow_html=True)
+    st.markdown('<div style="text-align:center; font-style:italic; color:#444;">Classifying the image...</div>', unsafe_allow_html=True)
 
     label, breed_name, confidence = predict_image(image)
-    animal_label = label.capitalize()
-
-    st.markdown(f"**Animal:** {animal_label}")
+    st.markdown(f"**Animal:** {label.capitalize()}")
     st.markdown(f"**Breed:** {breed_name} ({confidence:.2%} confidence)")
 
-    st.markdown('<div class="status-text">Generating breed description...</div>', unsafe_allow_html=True)
+    st.markdown('<div style="text-align:center; font-style:italic; color:#444;">Generating breed description...</div>', unsafe_allow_html=True)
 
     description = get_breed_description(label.lower(), breed_name)
     st.markdown(f"**Breed Description:**\n\n{description}")
