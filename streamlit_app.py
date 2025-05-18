@@ -19,7 +19,7 @@ def resize_with_aspect_ratio(image, max_size=300):
 # Set page config
 st.set_page_config(page_title="Dog and Cat Image Classifier", layout="centered")
 
-# Custom styles: black top bar + upload button styling
+# --- Styling: Top black bar + black uploader ---
 st.markdown(
     """
     <style>
@@ -35,7 +35,7 @@ st.markdown(
         box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
     }
 
-    /* Make uploader drop area black */
+    /* Custom uploader style */
     div[data-testid="stFileUploader"] > div:first-child {
         background-color: black !important;
         color: white !important;
@@ -44,7 +44,6 @@ st.markdown(
         padding: 20px;
     }
 
-    /* Force white icon and label inside uploader */
     div[data-testid="stFileUploader"] svg {
         color: white !important;
         fill: white !important;
@@ -71,14 +70,8 @@ st.markdown(
     """,
     unsafe_allow_html=True,
 )
-    <div class="top-bar">
-        LLM at Scale — Dog & Cat Classifier App
-    </div>
-    """,
-    unsafe_allow_html=True,
-)
 
-# Logo and title section
+# --- Logo and app title ---
 st.markdown(
     """
     <div style="text-align: center; margin-bottom: 5px;">
@@ -95,10 +88,10 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
-# Image upload section
+# --- Image uploader ---
 uploaded_file = st.file_uploader("Upload an image of a dog or cat", type=["jpg", "jpeg", "png"])
 
-# Process image if uploaded
+# --- Process image if uploaded ---
 if uploaded_file:
     image = Image.open(uploaded_file).convert("RGB")
     image = resize_with_aspect_ratio(image, max_size=300)
@@ -109,7 +102,7 @@ if uploaded_file:
     img_bytes = buf.getvalue()
     encoded_img = base64.b64encode(img_bytes).decode()
 
-    # Display the image
+    # Show uploaded image
     st.markdown(
         f"""
         <div style="text-align: center;">
@@ -119,18 +112,17 @@ if uploaded_file:
         unsafe_allow_html=True,
     )
 
-    # Status message
     st.markdown('<div class="status-text">Classifying the image...</div>', unsafe_allow_html=True)
 
-    # Run prediction
+    # Predict class and breed
     label, breed_name, confidence = predict_image(image)
     animal_label = label.capitalize()
 
-    # Display results
     st.markdown(f"**Animal:** {animal_label}")
     st.markdown(f"**Breed:** {breed_name} ({confidence:.2%} confidence)")
 
-    # Generate breed description
     st.markdown('<div class="status-text">Generating breed description...</div>', unsafe_allow_html=True)
+
+    # Generate breed description from LLM
     description = get_breed_description(label.lower(), breed_name)
     st.markdown(f"**Breed Description:**\n\n{description}")
