@@ -19,23 +19,11 @@ def resize_with_aspect_ratio(image, max_size=300):
 # Set page config
 st.set_page_config(page_title="Dog and Cat Image Classifier", layout="centered")
 
-# --- Styling: Top black bar + black uploader ---
+# --- Styling: ONLY drag and drop uploader is black ---
 st.markdown(
     """
     <style>
-    /* Top black bar */
-    .top-bar {
-        background-color: #000000;
-        color: white;
-        text-align: center;
-        padding: 12px 0;
-        font-size: 18px;
-        font-weight: 600;
-        margin-bottom: 20px;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
-    }
-
-    /* Custom uploader style */
+    /* Custom uploader style: black background + white dashed border + white text/icons */
     div[data-testid="stFileUploader"] > div:first-child {
         background-color: black !important;
         color: white !important;
@@ -45,15 +33,18 @@ st.markdown(
         cursor: pointer;
     }
 
+    /* Hover effect: slightly lighter black */
     div[data-testid="stFileUploader"] > div:first-child:hover {
         background-color: #222222 !important;
     }
 
+    /* Make SVG icons white */
     div[data-testid="stFileUploader"] svg {
         color: white !important;
         fill: white !important;
     }
 
+    /* Uploader label text */
     div[data-testid="stFileUploader"] label {
         color: white !important;
         font-weight: 600;
@@ -69,10 +60,6 @@ st.markdown(
         font-style: italic;
     }
     </style>
-
-    <div class="top-bar">
-        LLM at Scale — Dog & Cat Classifier App
-    </div>
     """,
     unsafe_allow_html=True,
 )
