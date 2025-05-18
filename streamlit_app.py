@@ -20,46 +20,44 @@ st.set_page_config(page_title="Dog and Cat Image Classifier", layout="centered")
 st.markdown(
     """
     <style>
-    /* Entire uploader container */
+    /* Entire file uploader area */
     div[data-testid="stFileUploader"] > div:first-child {
         background-color: black !important;
+        color: white !important;
         border: 2px dashed white !important;
-        border-radius: 10px;
+        border-radius: 12px;
         padding: 40px 20px;
         text-align: center;
-        font-size: 18px;
         font-weight: 700;
-        color: white !important;
+        font-size: 18px;
         cursor: pointer;
-        position: relative;
         user-select: none;
+        position: relative;
     }
-
-    /* Text inside uploader including placeholder text */
-    div[data-testid="stFileUploader"] label,
-    div[data-testid="stFileUploader"] span {
+    
+    /* Make placeholder text white */
+    div[data-testid="stFileUploader"] label {
         color: white !important;
         font-weight: 700 !important;
-        pointer-events: none;
     }
-
-    /* The browse files button */
+    
+    /* Browse button */
     div[data-testid="stFileUploader"] button {
         background-color: black !important;
         color: white !important;
         border: 2px solid white !important;
-        padding: 8px 16px !important;
+        padding: 8px 20px !important;
         font-weight: 700 !important;
         border-radius: 8px !important;
-        cursor: pointer !important;
-        margin-top: 12px;
+        margin-top: 15px;
+        cursor: pointer;
     }
     div[data-testid="stFileUploader"] button:hover {
         background-color: #222 !important;
         border-color: #ddd !important;
     }
-
-    /* The file input itself is invisible but clickable */
+    
+    /* Hide default file input */
     div[data-testid="stFileUploader"] input[type="file"] {
         opacity: 0;
         width: 100%;
@@ -69,42 +67,11 @@ st.markdown(
         cursor: pointer;
         z-index: 10;
     }
-
-    /* Icons inside uploader */
+    
+    /* Icon color */
     div[data-testid="stFileUploader"] svg {
         fill: white !important;
         color: white !important;
-    }
-
-    /* Make all text in app black and bold */
-    body, 
-    .css-18e3th9,
-    .css-1d391kg,
-    .stMarkdown,
-    div,
-    p,
-    span {
-        color: #000000 !important;
-        font-weight: 600 !important;
-    }
-
-    /* Response text styling */
-    .response-text {
-        color: #000000;
-        font-weight: 600;
-        margin-top: 10px;
-        margin-bottom: 10px;
-        font-size: 16px;
-    }
-
-    /* Status text */
-    .status-text {
-        text-align: center;
-        font-weight: normal;
-        color: #444444;
-        margin-bottom: 15px;
-        font-size: 14px;
-        font-style: italic;
     }
     </style>
     """,
@@ -147,15 +114,15 @@ if uploaded_file:
         unsafe_allow_html=True,
     )
 
-    st.markdown('<div class="status-text">Classifying the image...</div>', unsafe_allow_html=True)
+    st.markdown('<div style="text-align:center; font-weight: 600; color: black; margin-top: 10px;">Classifying the image...</div>', unsafe_allow_html=True)
 
     label, breed_name, confidence = predict_image(image)
     animal_label = label.capitalize()
 
-    st.markdown(f'<div class="response-text"><strong>Animal:</strong> {animal_label}</div>', unsafe_allow_html=True)
-    st.markdown(f'<div class="response-text"><strong>Breed:</strong> {breed_name} ({confidence:.2%} confidence)</div>', unsafe_allow_html=True)
+    st.markdown(f'<div style="font-weight: 600; color: black; margin-top: 10px;"><strong>Animal:</strong> {animal_label}</div>', unsafe_allow_html=True)
+    st.markdown(f'<div style="font-weight: 600; color: black; margin-top: 5px;"><strong>Breed:</strong> {breed_name} ({confidence:.2%} confidence)</div>', unsafe_allow_html=True)
 
-    st.markdown('<div class="status-text">Generating breed description...</div>', unsafe_allow_html=True)
+    st.markdown('<div style="text-align:center; font-style: italic; color: #444; margin-top: 15px;">Generating breed description...</div>', unsafe_allow_html=True)
 
     description = get_breed_description(label.lower(), breed_name)
-    st.markdown(f'<div class="response-text"><strong>Breed Description:</strong><br><br>{description}</div>', unsafe_allow_html=True)
+    st.markdown(f'<div style="font-weight: 600; color: black; margin-top: 10px;"><strong>Breed Description:</strong><br><br>{description}</div>', unsafe_allow_html=True)
