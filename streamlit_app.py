@@ -5,7 +5,7 @@ from description_model import get_breed_description
 import io
 import base64
 
-# Size the Image that is being uploaded and keeps the consistent ratio
+# Resize image while maintaining aspect ratio
 def resize_with_aspect_ratio(image, max_size=300):
     w, h = image.size
     if w > h:
@@ -16,22 +16,22 @@ def resize_with_aspect_ratio(image, max_size=300):
         new_w = int(w * max_size / h)
     return image.resize((new_w, new_h))
 
-#Title of the streamLit app
+# Set the app title and layout
 st.set_page_config(page_title="Dog and Cat Image Classifier", layout="centered")
 
-# Background of the StreamLit app
+# Apply custom styling: white background, black text
 st.markdown(
     """
     <style>
     .main {
-        background-color: black;
-        color: white;
+        background-color: white;
+        color: black;
     }
     .uploader-label {
         font-size: 16px !important;
         font-weight: normal !important;
         margin-bottom: 8px !important;
-        color: white !important;
+        color: black !important;
     }
     input[type="file"] {
         font-size: 16px !important;
@@ -42,48 +42,48 @@ st.markdown(
     .status-text {
         text-align: center;
         font-weight: normal;
-        color: #555555;  /* Dark gray */
+        color: #444444;
         margin-bottom: 15px;
-        font-size: 14px; /* Smaller font size */
-        font-style: italic;  /* Optional: italic for subtle effect */
+        font-size: 14px;
+        font-style: italic;
     }
     </style>
     """,
     unsafe_allow_html=True,
 )
 
-# LLM at scale logo
+# LLM at Scale logo and title section
 st.markdown(
     """
     <div style="text-align: center; margin-bottom: 5px;">
         <img src="https://raw.githubusercontent.com/Recktor101/dog-cat-llm-app/main/assets/llmatscale-logo.png" width="250">
-        <div style="font-size: 10px; color: lightgray; margin-top: 4px;">
+        <div style="font-size: 10px; color: gray; margin-top: 4px;">
             LLM at Scale
         </div>
-        <div style="font-size: 24px; font-weight: 700; color: #FFFFFF; margin-top: 8px;">
+        <div style="font-size: 24px; font-weight: 700; color: black; margin-top: 8px;">
             Dog and Cat Image Classifier
         </div>
     </div>
-    <hr style="margin-top: 10px; margin-bottom: 20px; border-color: white;">
+    <hr style="margin-top: 10px; margin-bottom: 20px; border-color: black;">
     """,
     unsafe_allow_html=True,
 )
 
-# Button to take a PNG/JPEG/JPG image of a dog or a cat
+# Image upload section
 uploaded_file = st.file_uploader("Upload an image of a dog or cat", type=["jpg", "jpeg", "png"])
 
-# Open the image and resize it to 300 pixels, and temporarily save the image.
+# Process image if uploaded
 if uploaded_file:
     image = Image.open(uploaded_file).convert("RGB")
     image = resize_with_aspect_ratio(image, max_size=300)
 
-    # Image format
+    # Convert image to base64 for inline display
     buf = io.BytesIO()
     image.save(buf, format="PNG")
     img_bytes = buf.getvalue()
     encoded_img = base64.b64encode(img_bytes).decode()
 
-    # Show the Displayed Image at the Center
+    # Display the image in the center
     st.markdown(
         f"""
         <div style="text-align: center;">
@@ -93,17 +93,18 @@ if uploaded_file:
         unsafe_allow_html=True,
     )
 
-    # Show the italics wording for classifying the image
+    # Status while processing
     st.markdown('<div class="status-text">Classifying the image...</div>', unsafe_allow_html=True)
 
-    # Predict animal type, breed, and confidence
+    # Predict label and breed
     label, breed_name, confidence = predict_image(image)
     animal_label = label.capitalize()
-    # Shows the actual breed type and animal
+
+    # Show prediction results
     st.markdown(f"**Animal:** {animal_label}")
     st.markdown(f"**Breed:** {breed_name} ({confidence:.2%} confidence)")
 
-    # Generates the breed description using Google T5 Flan
+    # Generate breed description
     st.markdown('<div class="status-text">Generating breed description...</div>', unsafe_allow_html=True)
     description = get_breed_description(label.lower(), breed_name)
     st.markdown(f"**Breed Description:**\n\n{description}")
