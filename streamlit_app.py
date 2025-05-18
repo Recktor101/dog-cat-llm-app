@@ -5,6 +5,7 @@ from description_model import get_breed_description
 import io
 import base64
 
+# Resize image while maintaining aspect ratio
 def resize_with_aspect_ratio(image, max_size=300):
     w, h = image.size
     if w > h:
@@ -15,84 +16,41 @@ def resize_with_aspect_ratio(image, max_size=300):
         new_w = int(w * max_size / h)
     return image.resize((new_w, new_h))
 
+# Set page config
 st.set_page_config(page_title="Dog and Cat Image Classifier", layout="centered")
 
+# --- Styling: Top black bar + black uploader ---
 st.markdown(
     """
     <style>
-    /* Container around uploader */
+    /* Top black bar */
+    .top-bar {
+        background-color: #000000;
+        color: white;
+        text-align: center;
+        padding: 12px 0;
+        font-size: 18px;
+        font-weight: 600;
+        margin-bottom: 20px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    }
+
+    /* Custom uploader style */
     div[data-testid="stFileUploader"] > div:first-child {
         background-color: black !important;
+        color: white !important;
         border: 2px dashed white !important;
         border-radius: 10px;
-        padding: 30px 20px;
-        text-align: center;
-        font-size: 18px;
-        font-weight: 700;
+        padding: 20px;
+    }
+
+    div[data-testid="stFileUploader"] svg {
         color: white !important;
-        cursor: pointer;
-        position: relative;
-        user-select: none;
+        fill: white !important;
     }
 
-    /* Force the button inside uploader black */
-    div[data-testid="stFileUploader"] button {
-        background-color: black !important;
-        color: white !important;
-        border: 2px solid white !important;
-        padding: 8px 16px !important;
-        font-weight: 700 !important;
-        border-radius: 8px !important;
-        cursor: pointer !important;
-    }
-    div[data-testid="stFileUploader"] button:hover {
-        background-color: #222 !important;
-        border-color: #ddd !important;
-    }
-
-    /* File input */
-    div[data-testid="stFileUploader"] input[type="file"] {
-        opacity: 0;
-        width: 100%;
-        height: 100%;
-        position: absolute;
-        top: 0; left: 0;
-        cursor: pointer;
-        z-index: 10;
-    }
-
-    /* Label text */
     div[data-testid="stFileUploader"] label {
         color: white !important;
-        font-weight: 700 !important;
-        pointer-events: none;
-    }
-
-    /* Icons in uploader */
-    div[data-testid="stFileUploader"] svg {
-        fill: white !important;
-        color: white !important;
-    }
-
-    /* All app text black & bold */
-    body, 
-    .css-18e3th9,
-    .css-1d391kg,
-    .stMarkdown,
-    div,
-    p,
-    span {
-        color: #000000 !important;
-        font-weight: 600 !important;
-    }
-
-    /* Response text styling */
-    .response-text {
-        color: #000000;
-        font-weight: 600;
-        margin-top: 10px;
-        margin-bottom: 10px;
-        font-size: 16px;
     }
 
     /* Status text */
@@ -105,10 +63,15 @@ st.markdown(
         font-style: italic;
     }
     </style>
+
+    <div class="top-bar">
+        LLM at Scale — Dog & Cat Classifier App
+    </div>
     """,
     unsafe_allow_html=True,
 )
 
+# --- Logo and app title ---
 st.markdown(
     """
     <div style="text-align: center; margin-bottom: 5px;">
@@ -125,17 +88,21 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
+# --- Image uploader ---
 uploaded_file = st.file_uploader("Upload an image of a dog or cat", type=["jpg", "jpeg", "png"])
 
+# --- Process image if uploaded ---
 if uploaded_file:
     image = Image.open(uploaded_file).convert("RGB")
     image = resize_with_aspect_ratio(image, max_size=300)
 
+    # Convert image to base64 for inline display
     buf = io.BytesIO()
     image.save(buf, format="PNG")
     img_bytes = buf.getvalue()
     encoded_img = base64.b64encode(img_bytes).decode()
 
+    # Show uploaded image
     st.markdown(
         f"""
         <div style="text-align: center;">
@@ -147,13 +114,15 @@ if uploaded_file:
 
     st.markdown('<div class="status-text">Classifying the image...</div>', unsafe_allow_html=True)
 
+    # Predict class and breed
     label, breed_name, confidence = predict_image(image)
     animal_label = label.capitalize()
 
-    st.markdown(f'<div class="response-text"><strong>Animal:</strong> {animal_label}</div>', unsafe_allow_html=True)
-    st.markdown(f'<div class="response-text"><strong>Breed:</strong> {breed_name} ({confidence:.2%} confidence)</div>', unsafe_allow_html=True)
+    st.markdown(f"**Animal:** {animal_label}")
+    st.markdown(f"**Breed:** {breed_name} ({confidence:.2%} confidence)")
 
     st.markdown('<div class="status-text">Generating breed description...</div>', unsafe_allow_html=True)
 
+    # Generate breed description from LLM
     description = get_breed_description(label.lower(), breed_name)
-    st.markdown(f'<div class="response-text"><strong>Breed Description:</strong><br><br>{description}</div>', unsafe_allow_html=True)
+    st.markdown(f"**Breed Description:**\n\n{description}")
