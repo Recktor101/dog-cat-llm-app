@@ -130,4 +130,4 @@ if uploaded_file:
 
     # Generate breed description from LLM
     description = get_breed_description(label.lower(), breed_name)
-    st.markdown(f'<div class="response-text"><strong>Breed Description:</strong><br><br>{description}</div>', unsafe_allow_ht
+    st.markdown(f'<div class="response-text"><strong>Breed Description:</strong><br><br>{description}</div>', unsafe_allow_html=True)
