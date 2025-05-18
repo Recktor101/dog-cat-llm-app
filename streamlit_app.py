@@ -42,6 +42,11 @@ st.markdown(
         border: 2px dashed white !important;
         border-radius: 10px;
         padding: 20px;
+        cursor: pointer;
+    }
+
+    div[data-testid="stFileUploader"] > div:first-child:hover {
+        background-color: #222222 !important;
     }
 
     div[data-testid="stFileUploader"] svg {
@@ -51,6 +56,7 @@ st.markdown(
 
     div[data-testid="stFileUploader"] label {
         color: white !important;
+        font-weight: 600;
     }
 
     /* Status text */
