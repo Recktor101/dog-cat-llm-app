@@ -37,16 +37,17 @@ st.markdown(
     .main > div:first-child {
         padding-top: 20px;
     }
-    </style>
-    <div class="top-black-bar"></div>
-    """,
-    unsafe_allow_html=True,
-)
 
-# --- Styling ONLY for drag and drop uploader: black background + white text ---
-st.markdown(
-    """
-    <style>
+    /* Tiny label above uploader */
+    .upload-label {
+        font-size: 11px;
+        color: #666666;
+        font-style: italic;
+        text-align: center;
+        margin-bottom: 4px;
+        font-weight: 500;
+    }
+    
     /* Drag and drop uploader area */
     div[data-testid="stFileUploader"] > div:first-child {
         background-color: black !important;
@@ -78,6 +79,7 @@ st.markdown(
         font-style: italic;
     }
     </style>
+    <div class="top-black-bar"></div>
     """,
     unsafe_allow_html=True,
 )
@@ -99,8 +101,11 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
+# --- Tiny label above uploader ---
+st.markdown('<div class="upload-label">Upload dog or cat photo</div>', unsafe_allow_html=True)
+
 # --- File uploader ---
-uploaded_file = st.file_uploader("Upload an image of a dog or cat", type=["jpg", "jpeg", "png"])
+uploaded_file = st.file_uploader("", type=["jpg", "jpeg", "png"])  # empty label since we added custom above
 
 # --- Process uploaded image ---
 if uploaded_file:
