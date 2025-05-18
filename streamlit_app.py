@@ -16,29 +16,42 @@ def resize_with_aspect_ratio(image, max_size=300):
         new_w = int(w * max_size / h)
     return image.resize((new_w, new_h))
 
-# Set the app title and layout
+# Set page config
 st.set_page_config(page_title="Dog and Cat Image Classifier", layout="centered")
 
-# Apply custom styling: white background, black text
+# Custom styles: black top bar + upload button styling
 st.markdown(
     """
     <style>
-    .main {
-        background-color: white;
-        color: black;
+    /* Top black bar */
+    .top-bar {
+        background-color: #000000;
+        color: white;
+        text-align: center;
+        padding: 12px 0;
+        font-size: 18px;
+        font-weight: 600;
+        margin-bottom: 20px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
     }
-    .uploader-label {
-        font-size: 16px !important;
-        font-weight: normal !important;
-        margin-bottom: 8px !important;
-        color: black !important;
+
+    /* Style uploader */
+    section[data-testid="stFileUploader"] > div {
+        background-color: #000000;
+        color: white;
+        border-radius: 8px;
+        padding: 12px;
     }
-    input[type="file"] {
-        font-size: 16px !important;
-        padding: 10px !important;
-        cursor: pointer;
-        color: black !important;
+
+    section[data-testid="stFileUploader"] label {
+        color: white !important;
     }
+
+    section[data-testid="stFileUploader"] svg {
+        fill: white !important;
+    }
+
+    /* Status text style */
     .status-text {
         text-align: center;
         font-weight: normal;
@@ -48,11 +61,15 @@ st.markdown(
         font-style: italic;
     }
     </style>
+
+    <div class="top-bar">
+        LLM at Scale — Dog & Cat Classifier App
+    </div>
     """,
     unsafe_allow_html=True,
 )
 
-# LLM at Scale logo and title section
+# Logo and title section
 st.markdown(
     """
     <div style="text-align: center; margin-bottom: 5px;">
@@ -83,7 +100,7 @@ if uploaded_file:
     img_bytes = buf.getvalue()
     encoded_img = base64.b64encode(img_bytes).decode()
 
-    # Display the image in the center
+    # Display the image
     st.markdown(
         f"""
         <div style="text-align: center;">
@@ -93,14 +110,14 @@ if uploaded_file:
         unsafe_allow_html=True,
     )
 
-    # Status while processing
+    # Status message
     st.markdown('<div class="status-text">Classifying the image...</div>', unsafe_allow_html=True)
 
-    # Predict label and breed
+    # Run prediction
     label, breed_name, confidence = predict_image(image)
     animal_label = label.capitalize()
 
-    # Show prediction results
+    # Display results
     st.markdown(f"**Animal:** {animal_label}")
     st.markdown(f"**Breed:** {breed_name} ({confidence:.2%} confidence)")
 
