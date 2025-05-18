@@ -19,21 +19,21 @@ def resize_with_aspect_ratio(image, max_size=300):
 # Set page config
 st.set_page_config(page_title="Dog and Cat Image Classifier", layout="centered")
 
-# --- Full width black bar at top ---
+# --- Full width black bar at top, with white background below ---
 st.markdown(
     """
     <style>
-    /* Full width black bar at top */
+    /* Black bar fixed at the very top */
     .top-black-bar {
         position: fixed;
         top: 0;
         left: 0;
         width: 100vw;
-        height: 20px;  /* thickness of the bar */
+        height: 20px;  /* adjust thickness here */
         background-color: black;
         z-index: 9999;
     }
-    /* Add top padding so content is not hidden behind bar */
+    /* Push page content down so it doesn't get hidden behind the bar */
     .main > div:first-child {
         padding-top: 20px;
     }
@@ -82,7 +82,7 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
-# --- Logo and app title (NO black top bar here) ---
+# --- Logo and app title ---
 st.markdown(
     """
     <div style="text-align: center; margin-bottom: 5px;">
