@@ -5,7 +5,7 @@ from description_model import get_breed_description
 import io
 import base64
 
-# Resize image while maintaining aspect ratio
+# A Function that resizes an uploaded image and keeping ratio
 def resize_with_aspect_ratio(image, max_size=300):
     w, h = image.size
     if w > h:
@@ -16,10 +16,10 @@ def resize_with_aspect_ratio(image, max_size=300):
         new_w = int(w * max_size / h)
     return image.resize((new_w, new_h))
 
-# Page setup
+# Page Set up With title
 st.set_page_config(page_title="Dog and Cat Image Classifier", layout="centered")
 
-# --- Top black bar ---
+#Full CSS for styling the uploading textbox
 st.markdown(
     """
     <style>
@@ -72,7 +72,7 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
-# --- Logo and app title ---
+#LLM At Scale Logo
 st.markdown(
     """
     <div style="text-align: center; margin-bottom: 5px;">
@@ -89,13 +89,13 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
-# --- Label above uploader ---
+#Label saying Upload a image of a Dog or Cat
 st.markdown('<div class="custom-upload-label">Upload an image of a Dog or Cat</div>', unsafe_allow_html=True)
 
-# --- File uploader ---
+# # file upload color
 uploaded_file = st.file_uploader("", type=["jpg", "jpeg", "png"])
 
-# --- Process uploaded image ---
+# Once the button is clicked
 if uploaded_file:
     image = Image.open(uploaded_file).convert("RGB")
     image = resize_with_aspect_ratio(image, max_size=300)
@@ -104,6 +104,7 @@ if uploaded_file:
     image.save(buf, format="PNG")
     encoded_img = base64.b64encode(buf.getvalue()).decode()
 
+    # Show upload image on screen
     st.markdown(
         f"""
         <div style="text-align: center;">
@@ -112,9 +113,10 @@ if uploaded_file:
         """,
         unsafe_allow_html=True,
     )
-
+    # SHow upload image on screen
     st.markdown('<div style="text-align:center; font-style:italic; color:#444;">Classifying the image...</div>', unsafe_allow_html=True)
 
+    # Gives predictions and labels
     label, breed_name, confidence = predict_image(image)
     st.markdown(f"**Animal:** {label.capitalize()}")
     st.markdown(f"**Breed:** {breed_name} ({confidence:.2%} confidence)")
