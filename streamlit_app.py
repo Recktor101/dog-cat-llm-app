@@ -19,11 +19,13 @@ def resize_with_aspect_ratio(image, max_size=300):
 # Set page config
 st.set_page_config(page_title="Dog and Cat Image Classifier", layout="centered")
 
-# --- Styling: ONLY drag and drop uploader is black ---
+# --- Styling ONLY for drag and drop uploader: black background + white text ---
 st.markdown(
     """
     <style>
-    /* Custom uploader style: black background + white dashed border + white text/icons */
+    /* Remove any black top bar - no top bar CSS here */
+
+    /* Drag and drop uploader area */
     div[data-testid="stFileUploader"] > div:first-child {
         background-color: black !important;
         color: white !important;
@@ -32,19 +34,13 @@ st.markdown(
         padding: 20px;
         cursor: pointer;
     }
-
-    /* Hover effect: slightly lighter black */
     div[data-testid="stFileUploader"] > div:first-child:hover {
         background-color: #222222 !important;
     }
-
-    /* Make SVG icons white */
     div[data-testid="stFileUploader"] svg {
         color: white !important;
         fill: white !important;
     }
-
-    /* Uploader label text */
     div[data-testid="stFileUploader"] label {
         color: white !important;
         font-weight: 600;
@@ -64,7 +60,7 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
-# --- Logo and app title ---
+# --- Logo and app title (NO black top bar here) ---
 st.markdown(
     """
     <div style="text-align: center; margin-bottom: 5px;">
@@ -81,21 +77,20 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
-# --- Image uploader ---
+# --- File uploader ---
 uploaded_file = st.file_uploader("Upload an image of a dog or cat", type=["jpg", "jpeg", "png"])
 
-# --- Process image if uploaded ---
+# --- Process uploaded image ---
 if uploaded_file:
     image = Image.open(uploaded_file).convert("RGB")
     image = resize_with_aspect_ratio(image, max_size=300)
 
-    # Convert image to base64 for inline display
+    # Convert to base64 for display
     buf = io.BytesIO()
     image.save(buf, format="PNG")
     img_bytes = buf.getvalue()
     encoded_img = base64.b64encode(img_bytes).decode()
 
-    # Show uploaded image
     st.markdown(
         f"""
         <div style="text-align: center;">
@@ -107,7 +102,6 @@ if uploaded_file:
 
     st.markdown('<div class="status-text">Classifying the image...</div>', unsafe_allow_html=True)
 
-    # Predict class and breed
     label, breed_name, confidence = predict_image(image)
     animal_label = label.capitalize()
 
@@ -116,6 +110,5 @@ if uploaded_file:
 
     st.markdown('<div class="status-text">Generating breed description...</div>', unsafe_allow_html=True)
 
-    # Generate breed description from LLM
     description = get_breed_description(label.lower(), breed_name)
     st.markdown(f"**Breed Description:**\n\n{description}")
