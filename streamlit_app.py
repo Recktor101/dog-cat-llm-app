@@ -19,12 +19,34 @@ def resize_with_aspect_ratio(image, max_size=300):
 # Set page config
 st.set_page_config(page_title="Dog and Cat Image Classifier", layout="centered")
 
+# --- Full width black bar at top ---
+st.markdown(
+    """
+    <style>
+    /* Full width black bar at top */
+    .top-black-bar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 20px;  /* thickness of the bar */
+        background-color: black;
+        z-index: 9999;
+    }
+    /* Add top padding so content is not hidden behind bar */
+    .main > div:first-child {
+        padding-top: 20px;
+    }
+    </style>
+    <div class="top-black-bar"></div>
+    """,
+    unsafe_allow_html=True,
+)
+
 # --- Styling ONLY for drag and drop uploader: black background + white text ---
 st.markdown(
     """
     <style>
-    /* Remove any black top bar - no top bar CSS here */
-
     /* Drag and drop uploader area */
     div[data-testid="stFileUploader"] > div:first-child {
         background-color: black !important;
